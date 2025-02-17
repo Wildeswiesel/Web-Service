@@ -1,0 +1,21 @@
+body {
+    font-family: sans-serif;
+    margin: 20px;
+  }
+  
+  header nav a {
+    margin-right: 10px;
+    text-decoration: none;
+    color: #333;
+  }
+  
+  table {
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  table, th, td {
+    border: 1px solid #999;
+    padding: 6px 10px;
+  }
+  

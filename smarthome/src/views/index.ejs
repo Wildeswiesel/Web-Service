@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>SmartHome - Übersicht</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <%- include('partials/header') %>
+  
+  <h1>SmartHome-Dashboard</h1>
+  
+  <section>
+    <h2>Vorhandene Geräte</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Device ID</th>
+          <th>Typ</th>
+          <th>Raum</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% devices.forEach(device => { %>
+          <tr>
+            <td><%= device.deviceId %></td>
+            <td><%= device.type %></td>
+            <td><%= device.roomId || '—' %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Neues Gerät registrieren</h2>
+    <form action="/register" method="POST">
+      <div>
+        <label for="deviceId">Device ID:</label>
+        <input type="text" name="deviceId" id="deviceId" required>
+      </div>
+      <div>
+        <label for="type">Gerätetyp:</label>
+        <select name="type" id="type">
+          <option value="fensterkontakt">Fensterkontakt</option>
+          <option value="thermostat">Thermostat</option>
+        </select>
+      </div>
+      <div>
+        <label for="roomId">Raum:</label>
+        <input type="text" name="roomId" id="roomId" placeholder="z.B. Wohnzimmer" />
+      </div>
+      <button type="submit">Registrieren</button>
+    </form>
+  </section>
+</body>
+</html>
