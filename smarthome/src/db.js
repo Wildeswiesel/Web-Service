@@ -1,5 +1,6 @@
+//anmelde Funktion
 const { Pool } = require('pg');
-
+//anmelde Daten
 const pool = new Pool({
   user: process.env.PGUSER || 'postgres',
   host: process.env.PGHOST || 'db',
