@@ -1,18 +1,19 @@
-FROM node:18-alpine
+FROM node:18
 
-WORKDIR /app
+# Setze das richtige Arbeitsverzeichnis
+WORKDIR /app/smarthome
 
-# package.json + package-lock.json ins Image kopieren
-COPY package*.json ./
+# Kopiere die package.json und package-lock.json für eine effiziente Installation der Abhängigkeiten
+COPY smarthome/package*.json ./
 
-# Abhängigkeiten installieren
+# Installiere die Abhängigkeiten
 RUN npm install
 
-# Restliche Dateien kopieren
-COPY . .
+# Kopiere den gesamten Code ins richtige Verzeichnis
+COPY smarthome/. . 
 
-# (optional) Node-Port
+# Exponiere den Port 3000 für den Container
 EXPOSE 3000
 
-# Start-Befehl
+# Starte die Anwendung
 CMD ["npm", "start"]

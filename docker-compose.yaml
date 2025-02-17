@@ -1,0 +1,30 @@
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: devicesdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    ports:
+      - '5432:5432'
+
+  app:
+    build:
+      context: .
+      dockerfile: smarthome/Dockerfile
+    ports:
+      - '3000:3000'
+    environment:
+      PGHOST: db
+      PGUSER: postgres
+      PGPASSWORD: secret
+      PGDATABASE: devicesdb
+    depends_on:
+      db:
+        condition: service_healthy

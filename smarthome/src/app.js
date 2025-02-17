@@ -1,6 +1,9 @@
+// src/app.js
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
+const deviceRoutes = require('./routes/deviceRoutes');
+const deviceService = require('./services/deviceService'); // z.B. für serverseitiges Rendering
 
 const app = express();
 
@@ -8,75 +11,41 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-// Statische Dateien, z.B. CSS
+// Statische Dateien
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
-// EJS als View Engine konfigurieren
+// EJS einrichten
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-// In-Memory-Geräteliste
-let devices = [];
+// Routen
+app.use('/devices', deviceRoutes);
 
-/**
- * GET /  -> Startseite mit Geräten
- */
-app.get('/', (req, res) => {
-  res.render('index', { 
-    devices: devices 
-  });
+app.get('/', async (req, res) => {
+  try {
+    const devices = await deviceService.getAllDevices();
+    res.render('index', { devices });
+  } catch (err) {
+    console.error('Fehler beim Laden der Geräte:', err);
+    res.status(500).send('Serverfehler');
+  }
 });
 
-/**
- * POST /register -> Neues Gerät anlegen
- * (Body: { deviceId, type, roomId })
- */
-app.post('/register', (req, res) => {
+// POST-Formular (aus index.ejs)
+app.post('/register', async (req, res) => {
   const { deviceId, type, roomId } = req.body;
-  
-  // Einfacher Check, keine ausgefeilte Validierung
   if (!deviceId || !type) {
-    return res.status(400).send('deviceId und type sind Pflichtfelder!');
+    return res.status(400).send('deviceId und type sind Pflichtfelder');
   }
 
-  // Neues Gerät in In-Memory-Liste
-  const newDevice = { deviceId, type, roomId: roomId || '' };
-  devices.push(newDevice);
-  console.log('Gerät registriert:', newDevice);
-
-  // Zurück zur Startseite
-  res.redirect('/');
+  try {
+    await deviceService.addDevice(deviceId, type, roomId);
+    res.redirect('/');
+  } catch (err) {
+    console.error('Fehler beim Hinzufügen eines Geräts:', err);
+    res.status(500).send('Gerät konnte nicht angelegt werden');
+  }
 });
-
-/**
- * GET /devices -> JSON-Ausgabe aller Geräte
- */
-app.get('/devices', (req, res) => {
-  res.json(devices);
-});
-
-/**
- * Beispiel-Endpunkt: Fenster-Event
- * (Body: { deviceId: string, status: 'open'|'closed' })
- */
-app.post('/window-event', (req, res) => {
-  const { deviceId, status } = req.body;
-  console.log(`Fensterkontakt ${deviceId} meldet: ${status}`);
-  
-  // Hier Logik, um passende Thermostate zu suchen und abzusenken o.ä.
-  res.json({ success: true });
-});
-
-/**
- * Beispiel-Endpunkt: Thermostat-Update
- * (Body: { deviceId: string, currentTemp: number })
- */
-app.post('/temperature-update', (req, res) => {
-  const { deviceId, currentTemp } = req.body;
-  console.log(`Thermostat ${deviceId}: aktuelle Temperatur = ${currentTemp}°C`);
-  res.json({ success: true });
-});
-
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
