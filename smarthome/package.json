@@ -1,5 +1,5 @@
 {
-    "name": "my-smart-home",
+    "name": "smarthome",
     "version": "1.0.0",
     "description": "SmartHome mit SQLite-Datenbank",
     "main": "src/app.js",

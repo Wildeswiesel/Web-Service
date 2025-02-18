@@ -11,7 +11,7 @@ const docker = new Docker({ socketPath: '/var/run/docker.sock' });
 async function createThermostatContainer(thermostatId, defaultTemperature = 22, roomId = '') {
   try {
     const container = await docker.createContainer({
-      Image: 'thermostat-image', // Dieses Image muss vorher gebaut werden (siehe unten)
+      Image: 'thermostat-image', // Dieses Image muss vorher gebaut werden 
       name: `thermostat_${thermostatId}`,
       Env: [
         `THERMOSTAT_ID=${thermostatId}`,

@@ -21,6 +21,7 @@ services:
     build:
       context: .
       dockerfile: smarthome/Dockerfile
+    image: smarthome-image
     ports:
       - '3000:3000'
     environment:
