@@ -28,9 +28,24 @@ services:
       PGUSER: postgres
       PGPASSWORD: secret
       PGDATABASE: devicesdb
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # <-- Hier wird der Docker-Socket gemountet. Damit er Zugriff auf den Docker-Daemon des Hosts bekommt.
     depends_on:
       db:
         condition: service_healthy
+
+  # falls der Thermostat-Container noch nicht von Anfang an vorhanden sein soll, muss das Image manuell gebaut werden:          docker build -t thermostat-image -f thermostat/Dockerfile
+  thermostat:
+    build:
+      context: .
+      dockerfile: thermostat/Dockerfile
+    image: thermostat-image
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 3001
+      DEFAULT_TEMPERATURE: 22
+
 
 
 volumes:

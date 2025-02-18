@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const deviceRoutes = require('./routes/deviceRoutes');
 const deviceService = require('./services/deviceService'); // z.B. für serverseitiges Rendering
-//const roomRoutes = require('./routes/roomRoutes');
+const thermostatService = require('./services/thermostatService'); // für die Thermostate
 
 const app = express();
 
@@ -21,7 +21,6 @@ app.set('view engine', 'ejs');
 
 // Routen
 app.use('/devices', deviceRoutes);
-//app.use('/rooms', roomRoutes);
 
 app.get('/', async (req, res) => {
   try {
@@ -41,7 +40,11 @@ app.post('/register', async (req, res) => {
   }
 
   try {
-    await deviceService.addDevice(deviceId, type, roomId);
+    const newId = await deviceService.addDevice(deviceId, type, roomId);  //für die Thermostate
+    if (type === 'thermostat') {
+      await thermostatService.createThermostatContainer(Number(deviceId), 22, roomId);
+    }
+
     res.redirect('/');
   } catch (err) {
     console.error('Fehler beim Hinzufügen eines Geräts:', err);

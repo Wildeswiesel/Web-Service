@@ -1,10 +1,12 @@
 FROM node:18
 
-WORKDIR /app
+WORKDIR /app/thermostat
 
-COPY package*.json ./
+COPY thermostat/package*.json ./
 RUN npm install
 
-COPY . .
+COPY thermostat/. .
+
+EXPOSE 3001
 
 CMD ["npm", "start"]

@@ -1,0 +1,13 @@
+{
+  "name": "thermostat-service",
+  "version": "1.0.0",
+  "description": "Microservice für Thermostate",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
+
