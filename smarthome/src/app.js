@@ -32,6 +32,15 @@ app.get('/', async (req, res) => {
   }
 });
 
+app.get('/wohnzimmer', async (req, res) => {
+  try {
+    const devices = await deviceService.getWohnzimmerDevices();
+    res.render('wohnzimmer', { devices });
+  } catch (err) {
+    console.error('Fehler beim Laden der Geräte:', err);
+    res.status(500).send('Serverfehler');
+  }
+});
 // POST-Formular (aus index.ejs)
 app.post('/register', async (req, res) => {
   const { deviceId, type, roomId } = req.body;

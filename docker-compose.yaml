@@ -17,7 +17,7 @@ services:
       - pgdata:/var/lib/postgresql/data
 
 
-  app:
+  smarthome:
     build:
       context: .
       dockerfile: smarthome/Dockerfile

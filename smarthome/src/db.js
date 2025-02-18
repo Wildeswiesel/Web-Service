@@ -8,7 +8,7 @@ const pool = new Pool({
   password: process.env.PGPASSWORD || 'secret',
   port: 5432,
 });
-
+//Erstellt Tabelle devices falls diese nicht vorhanden ist
 async function initDb() {
   const createTableSQL = `
     CREATE TABLE IF NOT EXISTS devices (
