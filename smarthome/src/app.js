@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const deviceRoutes = require('./routes/deviceRoutes');
 const deviceService = require('./services/deviceService'); // z.B. für serverseitiges Rendering
+//const roomRoutes = require('./routes/roomRoutes');
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.set('view engine', 'ejs');
 
 // Routen
 app.use('/devices', deviceRoutes);
+//app.use('/rooms', roomRoutes);
 
 app.get('/', async (req, res) => {
   try {
