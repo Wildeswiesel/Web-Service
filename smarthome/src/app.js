@@ -63,7 +63,9 @@ app.post('/register', async (req, res) => {
     if (type === 'thermostat') {
       await thermostatService.createThermostatContainer(Number(deviceId), 22, roomId);
     }
-
+    else if (type === 'fensterkontakt') {
+      await fensterkontaktService.createFensterkontaktContainer()
+    }
     res.redirect('/');
   } catch (err) {
     console.error('Fehler beim Hinzufügen eines Geräts:', err);
