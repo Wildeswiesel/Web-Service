@@ -25,14 +25,25 @@
           <th>Device ID</th>
           <th>Typ</th>
           <th>Raum</th>
+          <th>Aktion</th>
         </tr>
       </thead>
       <tbody>
         <% devices.forEach(device => { %>
           <tr>
-            <td><%= device.deviceId %></td>
+            <td><%= device.deviceid %></td>
             <td><%= device.type %></td>
-            <td><%= device.roomId || '—' %></td>
+            <td><%= device.roomid || '—' %></td>
+            <td>
+              <% if (device.type === 'thermostat') { %>
+                  <span><%= device.temperature || '—' %>°C</span><!--  -- meint das es noch nicht vorhanden ist -->
+              <% } else if (device.type === 'fensterkontakt') { %>
+                <button onclick="moveWindow('<%= device.deviceid %>', 'up')">▲</button>
+                <button onclick="moveWindow('<%= device.deviceid %>', 'down')">▼</button>
+              <% } else { %>
+                —
+              <% } %>
+            </td>
           </tr>
         <% }) %>
       </tbody>
@@ -60,5 +71,12 @@
       <button type="submit">Registrieren</button>
     </form>
   </section>
+
+  <script>
+      function moveWindow(deviceId, direction) {
+        console.log(`Gerät \${deviceId} bewegt sich \${direction}`);
+      //muss noch erweitert werden
+      }
+  </script>
 </body>
 </html>

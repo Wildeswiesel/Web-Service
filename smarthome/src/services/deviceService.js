@@ -10,6 +10,18 @@ function getAllDevices() {
     .then((result) => result.rows);
 }
 
+function getWohnzimmerDevices() {
+  return db
+    .query("SELECT * FROM devices WHERE roomId ILIKE 'wohnzimmer'")
+    .then((result) => result.rows);
+}
+
+function getThermostate() {
+  return db
+    .query("SELECT * FROM devices WHERE type='thermostat'")
+    .then((result) => result.rows);
+}
+
 /**
  * Fügt ein neues Gerät hinzu und gibt die generierte ID zurück
  */
@@ -53,6 +65,8 @@ function deleteDevice(id) {
 
 module.exports = {
   getAllDevices,
+  getWohnzimmerDevices,
+  getThermostate,
   addDevice,
   getDeviceByDeviceId,
   deleteDevice,

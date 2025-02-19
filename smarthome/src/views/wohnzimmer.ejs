@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wohnzimmer</title>
+    <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+    <%- include('partials/header') %>
+
+    <h1>Wohnzimmer-Dashboard</h1>
+
+    <section>
+        <h2>Vorhandene Geräte</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Device ID</th>
+              <th>Typ</th>
+              <th>Raum</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% devices.forEach(device => { %>
+              <tr>
+                <td><%= device.deviceid %></td>
+                <td><%= device.type %></td>
+                <td><%= device.roomid || '—' %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </section>
+</body>
+</html>
