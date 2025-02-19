@@ -1,10 +1,13 @@
 FROM node:18
 
-WORKDIR /app
+WORKDIR /app/fensterkontakt
 
-COPY package*.json ./
+COPY fensterkontakt/package*.json ./
+
 RUN npm install
 
-COPY . .
+COPY fensterkontakt/. .
+
+EXPOSE 3002
 
 CMD ["npm", "start"]

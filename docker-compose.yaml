@@ -45,8 +45,17 @@ services:
     environment:
       PORT: 3001
       DEFAULT_TEMPERATURE: 22
-
-
-
+  
+  fensterkontakt:
+    build:
+      context: .
+      dockerfile: fensterkontakt/Dockerfile
+    image: fensterkontakt-image
+    ports:
+      - "3002:3002"
+    environment:
+      PORT: 3002
+  
+  
 volumes:
   pgdata:
