@@ -4,9 +4,9 @@
     "description": "Microservice für Fensterkontakte",
     "main": "src/app.js",
     "scripts": {
-      "start": "node src/app.js"
+        "start": "node src/app.js"
     },
     "dependencies": {
-      "express": "^4.18.2"
+        "express": "^4.21.2"
     }
-  } 
+}
