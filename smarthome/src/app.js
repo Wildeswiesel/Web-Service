@@ -2,7 +2,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
-const deviceRoutes = require('./routes/deviceRoutes');
 const deviceService = require('./services/deviceService'); // z.B. für serverseitiges Rendering
 const thermostatService = require('./services/thermostatService'); // für die Thermostate
 const thermostatRoutes = require('./routes/thermostatRoutes');
@@ -21,12 +20,21 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 // Routen
-app.use('/devices', deviceRoutes);
+app.use('/thermostats', thermostatRoutes);
 
 app.get('/', async (req, res) => {
   try {
     const devices = await deviceService.getAllDevices();
     res.render('index', { devices });
+  } catch (err) {
+    console.error('Fehler beim Laden der Geräte:', err);
+    res.status(500).send('Serverfehler');
+  }
+});
+
+app.get('/thermostat', async (req, res) => {
+  try {
+    res.render('thermostat');
   } catch (err) {
     console.error('Fehler beim Laden der Geräte:', err);
     res.status(500).send('Serverfehler');
@@ -42,11 +50,6 @@ app.get('/wohnzimmer', async (req, res) => {
     res.status(500).send('Serverfehler');
   }
 });
-
-
-//App.use
-
-app.use('/thermostats', thermostatRoutes);
 
 // POST-Formular (aus index.ejs)
 app.post('/register', async (req, res) => {
