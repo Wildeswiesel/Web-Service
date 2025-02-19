@@ -5,6 +5,7 @@ const path = require('path');
 const deviceRoutes = require('./routes/deviceRoutes');
 const deviceService = require('./services/deviceService'); // z.B. für serverseitiges Rendering
 const thermostatService = require('./services/thermostatService'); // für die Thermostate
+const thermostatRoutes = require('./routes/thermostatRoutes');
 
 const app = express();
 
@@ -41,6 +42,12 @@ app.get('/wohnzimmer', async (req, res) => {
     res.status(500).send('Serverfehler');
   }
 });
+
+
+//App.use
+
+app.use('/thermostats', thermostatRoutes);
+
 // POST-Formular (aus index.ejs)
 app.post('/register', async (req, res) => {
   const { deviceId, type, roomId } = req.body;

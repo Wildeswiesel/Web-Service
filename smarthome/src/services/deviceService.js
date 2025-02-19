@@ -16,6 +16,12 @@ function getWohnzimmerDevices() {
     .then((result) => result.rows);
 }
 
+function getThermostate() {
+  return db
+    .query("SELECT * FROM devices WHERE type='thermostat'")
+    .then((result) => result.rows);
+}
+
 /**
  * Fügt ein neues Gerät hinzu und gibt die generierte ID zurück
  */
@@ -60,6 +66,7 @@ function deleteDevice(id) {
 module.exports = {
   getAllDevices,
   getWohnzimmerDevices,
+  getThermostate,
   addDevice,
   getDeviceByDeviceId,
   deleteDevice,
