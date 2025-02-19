@@ -1,5 +1,12 @@
 {
-  "dependencies": {
-    "express": "^4.21.2"
-  }
-}
+    "name": "fensterkontakt-service",
+    "version": "1.0.0",
+    "description": "Microservice für Fensterkontakte",
+    "main": "src/app.js",
+    "scripts": {
+      "start": "node src/app.js"
+    },
+    "dependencies": {
+      "express": "^4.18.2"
+    }
+  } 
