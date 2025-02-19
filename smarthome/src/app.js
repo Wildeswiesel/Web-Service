@@ -63,6 +63,9 @@ app.post('/register', async (req, res) => {
     if (type === 'thermostat') {
       await thermostatService.createThermostatContainer(Number(deviceId), 22, roomId);
     }
+    else if (type === 'fensterkontakt') {
+      await fensterkontaktService.createFensterkontaktContainer(Number(deviceId), 'closed', roomId);
+    }
 
     res.redirect('/');
   } catch (err) {
