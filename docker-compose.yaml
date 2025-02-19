@@ -35,7 +35,7 @@ services:
       db:
         condition: service_healthy
 
-  # falls der Thermostat-Container noch nicht von Anfang an vorhanden sein soll, muss das Image manuell gebaut werden:          docker build -t thermostat-image -f thermostat/Dockerfile
+  # falls der Thermostat-Container noch nicht von Anfang an vorhanden sein soll, muss das Image manuell gebaut und dieser Teil auskommentiert werden:          docker build -t thermostat-image -f thermostat/Dockerfile
   thermostat:
     build:
       context: .
