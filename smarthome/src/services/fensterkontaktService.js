@@ -4,7 +4,7 @@ const docker = new Docker({ socketPath: '/var/run/docker.sock' });
  // Erstellt einen neuen Fenstekontakt-Container mit der übergebenen numerischen ID, einem Startzustand (Standard: 'closed') und optionaler Raumzuordnung.
 async function createFensterkontaktContainer(fensterkontaktId, defaultMode = 'closed', roomId = '') {
   //dynamischer Host-Port:
-  const hostPort = 3003 + fensterkontaktId;
+  const hostPort = 3001 + fensterkontaktId;
 
   try {
     const container = await docker.createContainer({
@@ -24,7 +24,7 @@ async function createFensterkontaktContainer(fensterkontaktId, defaultMode = 'cl
         PortBindings: {
           "3002/tcp": [
             {
-              "HostPort": hostPort.toString()  //Dynamischer HostPort nach Id   --> erreichbar z.B.: über http://localhost:3003/update   für Thermostat mit der Id = 1
+              "HostPort": hostPort.toString()  //Dynamischer HostPort nach Id   --> erreichbar z.B.: über http://localhost:3003/update   für Thermostat mit der Id = 2
             }
           ]
         }

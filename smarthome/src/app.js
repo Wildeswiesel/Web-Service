@@ -5,6 +5,8 @@ const path = require('path');
 const deviceService = require('./services/deviceService'); // z.B. für serverseitiges Rendering
 const thermostatService = require('./services/thermostatService'); // für die Thermostate
 const thermostatRoutes = require('./routes/thermostatRoutes');
+const fensterkontaktService = require('./services/fensterkontaktService'); // für die Fenster
+
 
 const app = express();
 

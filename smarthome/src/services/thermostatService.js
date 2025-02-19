@@ -4,7 +4,7 @@ const docker = new Docker({ socketPath: '/var/run/docker.sock' });
  // Erstellt einen neuen Thermostat-Container mit der übergebenen numerischen ID, einer Starttemperatur (Standard: 22°C) und optionaler Raumzuordnung.
 async function createThermostatContainer(thermostatId, defaultTemperature = 22, roomId = '') {
   //dynamischer Host-Port:
-  const hostPort = 3002 + thermostatId;
+  const hostPort = 3008 + thermostatId;
 
   try {
     const container = await docker.createContainer({
@@ -24,7 +24,7 @@ async function createThermostatContainer(thermostatId, defaultTemperature = 22, 
         PortBindings: {
           "3001/tcp": [
             {
-              "HostPort": hostPort.toString()  //Dynamischer HostPort nach Id   --> erreichbar z.B.: über http://localhost:3003/update   für Thermostat mit der Id = 1
+              "HostPort": hostPort.toString()  //Dynamischer HostPort nach Id   --> erreichbar z.B.: über http://localhost:3010/update   für Thermostat mit der Id = 2
             }
           ]
         }

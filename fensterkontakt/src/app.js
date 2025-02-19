@@ -77,6 +77,6 @@ app.get('/', (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Fensterkontakt (Raum ${roomId}) läuft auf Port ${port}`);
+    console.log(`Fensterkontakt (Raum: ${roomId}) läuft auf Port ${port}`);
 });
 

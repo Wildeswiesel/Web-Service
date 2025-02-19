@@ -3,7 +3,7 @@ const app = express();
 app.use(express.json());
 
 // Lese die numerische ID aus der ENV-Variable, falls gesetzt; ansonsten als Fallback "0"
-const thermostatId = process.env.THERMOSTAT_ID || '0';
+const thermostatId = process.env.THERMOSTAT_ID || '1';
 
 // Lese die Starttemperatur (als Zahl) aus der ENV-Variable
 let currentTemperature = Number(process.env.DEFAULT_TEMPERATURE) || 22;
@@ -43,6 +43,6 @@ app.post('/update', (req, res) => {
 
 const port = process.env.PORT || 3001;
 app.listen(port, () => {
-  console.log(`Thermostat ${thermostatId} (Raum ${roomId}) läuft auf Port ${port}`);
+  console.log(`Thermostat ${thermostatId} (Raum: ${roomId}) läuft auf Port ${port}`);
 });
 
