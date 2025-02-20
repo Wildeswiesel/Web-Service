@@ -25,12 +25,30 @@ async function initDb() {
     console.error('Fehler beim Erstellen der Tabelle:', err);
   }
 }
+//wird benötigt damit die ersten beiden container in der datenbank sind
+async function addDevice(deviceId, type, roomId) {
+  try {
+    const query = `
+      INSERT INTO devices (deviceId, type, roomId) 
+      VALUES ($1, $2, $3) 
+      RETURNING *;
+    `;
 
+    const values = [deviceId, type, roomId];
+    const result = await pool.query(query, values);
 
+    console.log('Gerät erfolgreich hinzugefügt:', result.rows[0]);
+    return result.rows[0];
+  } catch (err) {
+    console.error('Fehler beim Einfügen des Geräts:', err.message);
+    throw err;
+  }
+}
 
 initDb();
 
-
+addDevice(1, 'thermostat', 'Wohnzimmer');
+addDevice(1, 'fensterkontakt', 'Wohnzimmer');
 module.exports = {
   query: (text, params) => pool.query(text, params),
 };
