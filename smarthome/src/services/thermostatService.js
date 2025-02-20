@@ -9,7 +9,7 @@ async function createThermostatContainer(thermostatId, defaultTemperature = 22, 
   try {
     const container = await docker.createContainer({
       Image: 'thermostat-image', // Dieses Image muss vorher gebaut werden 
-      name: `thermostat-${thermostatId}`,    //Könnte man vermutlich noch anpassen zu thermostat-
+      name: `web-service-thermostat-${thermostatId}`,    //Könnte man vermutlich noch anpassen zu thermostat-
       Env: [
         `THERMOSTAT_ID=${thermostatId}`,
         `DEFAULT_TEMPERATURE=${defaultTemperature}`,
