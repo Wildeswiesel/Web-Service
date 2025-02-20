@@ -86,6 +86,24 @@ app.post('/register', async (req, res) => {
   }
 });
 
+app.delete('/devices/:id', async (req, res) => {
+  const { id } = req.params;
+  
+  try {
+    const rowsDeleted = await deviceService.deleteDevice(id);
+    
+    if (rowsDeleted > 0) {
+      res.status(200).send("Gerät gelöscht");
+    } else {
+      res.status(404).send("Gerät nicht gefunden");
+    }
+  } catch (error) {
+    console.error("Fehler beim Löschen:", error);
+    res.status(500).send("Interner Serverfehler");
+  }
+});
+
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`SmartHome läuft auf http://localhost:${PORT}`);

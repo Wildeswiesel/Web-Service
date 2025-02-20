@@ -60,7 +60,7 @@ function getDeviceByDeviceId(deviceId) {
 /**
  * Löschen eines Geräts anhand seiner internen ID
  */
-function deleteDevice(id) {
+async function deleteDevice(id) {
   const sql = 'DELETE FROM devices WHERE id = $1';
   return db.query(sql, [id])
     .then((result) => {

@@ -26,6 +26,7 @@
           <th>Typ</th>
           <th>Raum</th>
           <th>Aktion</th>
+          <th>Löschen</th>
         </tr>
       </thead>
       <tbody>
@@ -43,6 +44,10 @@
               <% } else { %>
                 —
               <% } %>
+            </td>
+            <td>
+              <!-- Lösch-Button hinzufügen -->
+                <button onclick="deleteDevice('<%= device.id %>')">🗑️ Löschen</button>
             </td>
           </tr>
         <% }) %>
@@ -77,6 +82,27 @@
         console.log(`Gerät \${deviceId} bewegt sich \${direction}`);
       //muss noch erweitert werden
       }
+
+      async function deleteDevice(deviceId) {
+    if (!confirm("Willst du dieses Gerät wirklich löschen?")) return;
+
+    try {
+      const response = await fetch(`/devices/${deviceId}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        alert("Gerät erfolgreich gelöscht!");
+        location.reload(); // Seite neu laden, um das entfernte Gerät nicht mehr anzuzeigen
+      } else {
+        const errorText = await response.text();
+        alert("Fehler beim Löschen: " + errorText);
+      }
+    } catch (error) {
+      console.error("Fehler beim Löschen des Geräts:", error);
+      alert("Es gab ein Problem beim Löschen des Geräts.");
+    }
+  }
   </script>
 </body>
 </html>
