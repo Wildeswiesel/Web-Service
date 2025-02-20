@@ -2,6 +2,8 @@
 services:
   db:
     image: postgres:15
+    networks: 
+      - smarthome-nw
     environment:
       POSTGRES_DB: devicesdb
       POSTGRES_USER: postgres
@@ -22,6 +24,8 @@ services:
       context: .
       dockerfile: smarthome/Dockerfile
     image: smarthome-image
+    networks: 
+      - smarthome-nw
     ports:
       - '3000:3000'
     environment:
@@ -41,6 +45,8 @@ services:
       context: .
       dockerfile: thermostat/Dockerfile
     image: thermostat-image
+    networks: 
+      - smarthome-nw
     ports:
       - "3001:3001"
     environment:
@@ -52,11 +58,17 @@ services:
       context: .
       dockerfile: fensterkontakt/Dockerfile
     image: fensterkontakt-image
+    networks: 
+      - smarthome-nw
     ports:
-      - "3002:3002"
+      - "3021:3021"
     environment:
-      PORT: 3002
+      PORT: 3021
   
   
 volumes:
   pgdata:
+
+networks:
+  smarthome-nw:
+    driver: bridge 

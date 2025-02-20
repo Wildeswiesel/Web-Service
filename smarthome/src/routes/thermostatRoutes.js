@@ -40,7 +40,7 @@ router.get('/:deviceId/status', async (req, res) => {
 
   // 2) Container-Hostname und Port
   const containerName = `web-service-thermostat-${deviceId}`;
-  const port = 3000+deviceId; // Hardcodiert, falls Thermostat immer auf 3001 läuft
+  const port = 300+deviceId; // Hardcodiert, falls Thermostat immer auf 3001 läuft
 
   // 3) Versuch, den Container per HTTP GET /status abzufragen
   try {
@@ -69,7 +69,7 @@ router.post('/:deviceId/normal', async (req, res) => {
   }
 
   const containerName = `web-service-thermostat-${deviceId}`;
-  const port = 3000+deviceId;
+  const port = 300+deviceId;
 
   // "Normaltemperatur" an den Thermostat schicken
   try {
@@ -101,7 +101,7 @@ router.post('/:deviceId/reduced', async (req, res) => {
   }
 
   const containerName = `web-service-thermostat-${deviceId}`;
-  const port = 3000+deviceId;
+  const port = 300+deviceId;
 
   // "Absenktemperatur" an den Thermostat schicken
   try {

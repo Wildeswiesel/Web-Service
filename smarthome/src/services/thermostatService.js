@@ -10,19 +10,23 @@ async function createThermostatContainer(thermostatId, defaultTemperature = 22, 
     const container = await docker.createContainer({
       Image: 'thermostat-image', // Dieses Image muss vorher gebaut werden 
       name: `web-service-thermostat-${thermostatId}`,    //Könnte man vermutlich noch anpassen zu thermostat-
+      
       Env: [
         `THERMOSTAT_ID=${thermostatId}`,
         `DEFAULT_TEMPERATURE=${defaultTemperature}`,
-        `ROOM_ID=${roomId}`
+        `ROOM_ID=${roomId}`,
+        `PORT=${hostPort}`
+        
       ],
       ExposedPorts: {
-        "3001/tcp": {}  //Der Container hört intern auf Port 3001
+        [`${hostPort}/tcp`]: {}   //Der Container hört intern auf Port 3001
       },
 
 
       HostConfig: {
+        NetworkMode: "web-service_smarthome-nw",
         PortBindings: {
-          "3001/tcp": [
+          [`${hostPort}/tcp`]: [
             {
               "HostPort": hostPort.toString()  //Dynamischer HostPort nach Id   --> erreichbar z.B.: über http://localhost:3002/update   für Thermostat mit der Id = 2
             }

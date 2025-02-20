@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+
 app.use(express.json());
 
 // Lese die numerische ID aus der ENV-Variable, falls gesetzt; ansonsten als Fallback "0"
@@ -40,7 +41,6 @@ app.post('/update', (req, res) => {
     message: "Thermostat aktualisiert"
   });
 });
-
 const port = process.env.PORT || 3001;
 app.listen(port, () => {
   console.log(`Thermostat ${thermostatId} (Raum: ${roomId}) läuft auf Port ${port}`);
