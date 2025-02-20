@@ -16,13 +16,14 @@ async function createFensterkontaktContainer(fensterkontaktId, defaultMode = 'cl
         `ROOM_ID=${roomId}`
       ],
       ExposedPorts: {
-        "3002/tcp": {}  
+        [`${hostPort}/tcp`]: {}  
       },
 
 
       HostConfig: {
+        NetworkMode: "web-service_smarthome-nw",
         PortBindings: {
-          "3002/tcp": [
+          [`${hostPort}/tcp`]:  [
             {
               "HostPort": hostPort.toString()  //Dynamischer HostPort nach Id   --> erreichbar z.B.: über http://localhost:3022/update   für Fensterkontakt mit der Id = 2
             }

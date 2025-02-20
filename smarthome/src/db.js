@@ -26,7 +26,10 @@ async function initDb() {
   }
 }
 
+
+
 initDb();
+
 
 module.exports = {
   query: (text, params) => pool.query(text, params),

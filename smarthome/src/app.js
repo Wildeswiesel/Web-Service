@@ -67,6 +67,7 @@ app.get('/wohnzimmer', async (req, res) => {
 app.post('/register', async (req, res) => {
   const { deviceId, type, roomId } = req.body;
   if (!deviceId || !type) {
+    console.log('Empfangener type:', type);
     return res.status(400).send('deviceId und type sind Pflichtfelder');
   }
 
