@@ -45,10 +45,20 @@ async function addDevice(deviceId, type, roomId) {
   }
 }
 
-initDb();
+async function start() {
+  try {
+    await initDb();  // Stellt sicher, dass die Tabelle erstellt wird, bevor Geräte eingefügt werden
+    console.log("✅ Datenbank-Initialisierung abgeschlossen.");
 
-addDevice(1, 'thermostat', 'Wohnzimmer');
-addDevice(1, 'fensterkontakt', 'Wohnzimmer');
+    await addDevice(1, 'thermostat', 'Wohnzimmer');
+    await addDevice(1, 'fensterkontakt', 'Wohnzimmer'); // Achte darauf, dass deviceId nicht doppelt ist
+    console.log("✅ Geräte wurden erfolgreich hinzugefügt.");
+  } catch (err) {
+    console.error("❌ Fehler während der Initialisierung:", err);
+  }
+}
+
+start()
 module.exports = {
   query: (text, params) => pool.query(text, params),
 };
