@@ -12,25 +12,36 @@
     <h1>Wohnzimmer-Dashboard</h1>
 
     <section>
-        <h2>Vorhandene Geräte</h2>
-        <table>
-          <thead>
+      <h2>Vorhandene Geräte</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Device ID</th>
+            <th>Typ</th>
+            <th>Raum</th>
+            <th>Aktion</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% devices.forEach(device => { %>
             <tr>
-              <th>Device ID</th>
-              <th>Typ</th>
-              <th>Raum</th>
+              <td><%= device.deviceid %></td>
+              <td><%= device.type %></td>
+              <td><%= device.roomid || '—' %></td>
+              <td>
+                <% if (device.type === 'thermostat') { %>
+                    <span><%= device.temperature || '—' %>°C</span><!--  -- meint das es noch nicht vorhanden ist -->
+                <% } else if (device.type === 'fensterkontakt') { %>
+                  <button onclick="moveWindow('<%= device.deviceid %>', 'up')">▲</button>
+                  <button onclick="moveWindow('<%= device.deviceid %>', 'down')">▼</button>
+                <% } else { %>
+                  —
+                <% } %>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            <% devices.forEach(device => { %>
-              <tr>
-                <td><%= device.deviceid %></td>
-                <td><%= device.type %></td>
-                <td><%= device.roomid || '—' %></td>
-              </tr>
-            <% }) %>
-          </tbody>
-        </table>
-      </section>
+          <% }) %>
+        </tbody>
+      </table>
+    </section>
 </body>
 </html>
