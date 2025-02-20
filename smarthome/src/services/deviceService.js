@@ -22,6 +22,12 @@ function getThermostate() {
     .then((result) => result.rows);
 }
 
+function getFensterkontakte() {
+  return db
+    .query("SELECT * FROM devices WHERE type='fensterkontakt'")
+    .then((result) => result.rows);
+}
+
 /**
  * Fügt ein neues Gerät hinzu und gibt die generierte ID zurück
  */
@@ -54,7 +60,7 @@ function getDeviceByDeviceId(deviceId) {
 /**
  * Löschen eines Geräts anhand seiner internen ID
  */
-function deleteDevice(id) {
+async function deleteDevice(id) {
   const sql = 'DELETE FROM devices WHERE id = $1';
   return db.query(sql, [id])
     .then((result) => {
@@ -67,6 +73,7 @@ module.exports = {
   getAllDevices,
   getWohnzimmerDevices,
   getThermostate,
+  getFensterkontakte,
   addDevice,
   getDeviceByDeviceId,
   deleteDevice,
