@@ -69,7 +69,7 @@ router.post('/:deviceId/normal', async (req, res) => {
   }
 
   const containerName = `web-service-thermostat-${deviceId}`;
-  const port = 3001;
+  const port = 3000+deviceId;
 
   // "Normaltemperatur" an den Thermostat schicken
   try {
@@ -101,7 +101,7 @@ router.post('/:deviceId/reduced', async (req, res) => {
   }
 
   const containerName = `web-service-thermostat-${deviceId}`;
-  const port = 3001;
+  const port = 3000+deviceId;
 
   // "Absenktemperatur" an den Thermostat schicken
   try {
