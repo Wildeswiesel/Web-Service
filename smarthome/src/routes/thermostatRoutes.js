@@ -40,7 +40,7 @@ router.get('/:deviceId/status', async (req, res) => {
 
   // 2) Container-Hostname und Port
   const containerName = `web-service-thermostat-${deviceId}`;
-  const port = 3001; // Hardcodiert, falls Thermostat immer auf 3001 läuft
+  const port = 3000+deviceId; // Hardcodiert, falls Thermostat immer auf 3001 läuft
 
   // 3) Versuch, den Container per HTTP GET /status abzufragen
   try {
