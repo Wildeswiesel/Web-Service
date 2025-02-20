@@ -87,7 +87,7 @@ async function deleteDevice(id) {
     if (containerName) {
       try {
         const container = await docker.getContainer(containerName);
-        await container.stop();
+        await container.kill(); 
         await container.remove();
         console.log(`Container ${containerName} gestoppt und entfernt.`);
       } catch (err) {
