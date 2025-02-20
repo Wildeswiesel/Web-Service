@@ -9,7 +9,7 @@ async function createFensterkontaktContainer(fensterkontaktId, defaultMode = 'cl
   try {
     const container = await docker.createContainer({
       Image: 'fensterkontakt-image', // Dieses Image muss vorher gebaut werden 
-      name: `fensterkontakt-${fensterkontaktId}`,    
+      name: `web-service-fensterkontakt-${fensterkontaktId}`,    
       Env: [
         `FENSTERKONTAKT_ID=${fensterkontaktId}`,
         `DEFAULT_MODE=${defaultMode}`,
