@@ -24,7 +24,7 @@ async function createFensterkontaktContainer(fensterkontaktId, defaultMode = 'cl
         PortBindings: {
           "3002/tcp": [
             {
-              "HostPort": hostPort.toString()  //Dynamischer HostPort nach Id   --> erreichbar z.B.: über http://localhost:3022/update   für Thermostat mit der Id = 2
+              "HostPort": hostPort.toString()  //Dynamischer HostPort nach Id   --> erreichbar z.B.: über http://localhost:3022/update   für Fensterkontakt mit der Id = 2
             }
           ]
         }
@@ -33,7 +33,7 @@ async function createFensterkontaktContainer(fensterkontaktId, defaultMode = 'cl
     await container.start();
     console.log(`Fensterkontakt-Container ${fensterkontaktId} gestartet. Host Port: ${hostPort}`);
   } catch (err) {
-    console.error(`Fehler beim Starten des Containers für Thermostat ${fensterkontaktId}:`, err);
+    console.error(`Fehler beim Starten des Containers für Fensterkontakt ${fensterkontaktId}:`, err);
     throw err;
   }
 }

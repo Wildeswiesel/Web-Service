@@ -22,6 +22,12 @@ function getThermostate() {
     .then((result) => result.rows);
 }
 
+function getFensterkontakte() {
+  return db
+    .query("SELECT * FROM devices WHERE type='fensterkontakt'")
+    .then((result) => result.rows);
+}
+
 /**
  * Fügt ein neues Gerät hinzu und gibt die generierte ID zurück
  */
@@ -67,6 +73,7 @@ module.exports = {
   getAllDevices,
   getWohnzimmerDevices,
   getThermostate,
+  getFensterkontakte,
   addDevice,
   getDeviceByDeviceId,
   deleteDevice,

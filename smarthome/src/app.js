@@ -6,7 +6,7 @@ const deviceService = require('./services/deviceService'); // z.B. für serverse
 const thermostatService = require('./services/thermostatService'); // für die Thermostate
 const thermostatRoutes = require('./routes/thermostatRoutes');
 const fensterkontaktService = require('./services/fensterkontaktService'); // für die Fenster
-
+const fensterkontaktRoutes = require('./routes/fensterkontaktRoutes') // Fensterkontakt routen
 
 const app = express();
 
@@ -23,6 +23,7 @@ app.set('view engine', 'ejs');
 
 // Routen
 app.use('/thermostats', thermostatRoutes);
+app.use('/fensterkontakte', fensterkontaktRoutes);
 
 app.get('/', async (req, res) => {
   try {
@@ -40,6 +41,15 @@ app.get('/thermostat', async (req, res) => {
   } catch (err) {
     console.error('Fehler beim Laden der Geräte:', err);
     res.status(500).send('Serverfehler');
+  }
+});
+
+app.get('/fensterkontakt', async (req, res) => {
+  try {
+    res.render('fensterkontakt');
+  } catch (err) {
+    console.error('Fehler beim Laden der Geräte:', err)
+    res.status(500).send('Serverfehler')
   }
 });
 
