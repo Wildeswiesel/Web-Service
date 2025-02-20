@@ -28,19 +28,31 @@ async function initDb() {
 //wird benötigt damit die ersten beiden container in der datenbank sind
 async function addDevice(deviceId, type, roomId) {
   try {
-    const query = `
+    // 1️⃣ Prüfen, ob das Gerät bereits existiert
+    const checkQuery = `
+      SELECT * FROM devices WHERE deviceId = $1 AND type = $2 AND roomId = $3;
+    `;
+    const checkResult = await pool.query(checkQuery, [deviceId, type, roomId]);
+
+    if (checkResult.rows.length > 0) {
+      console.log(`⚠️ Gerät (${deviceId}, ${type}, ${roomId}) existiert bereits.`);
+      return checkResult.rows[0]; // Bestehendes Gerät zurückgeben
+    }
+
+    // 2️⃣ Falls nicht vorhanden, füge das Gerät hinzu
+    const insertQuery = `
       INSERT INTO devices (deviceId, type, roomId) 
       VALUES ($1, $2, $3) 
       RETURNING *;
     `;
 
-    const values = [deviceId, type, roomId];
-    const result = await pool.query(query, values);
+    const result = await pool.query(insertQuery, [deviceId, type, roomId]);
+    console.log('✅ Gerät erfolgreich hinzugefügt:', result.rows[0]);
 
-    console.log('Gerät erfolgreich hinzugefügt:', result.rows[0]);
     return result.rows[0];
+
   } catch (err) {
-    console.error('Fehler beim Einfügen des Geräts:', err.message);
+    console.error('❌ Fehler beim Einfügen des Geräts:', err.message);
     throw err;
   }
 }
