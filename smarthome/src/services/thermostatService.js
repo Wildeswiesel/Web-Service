@@ -15,6 +15,8 @@ async function createThermostatContainer(thermostatId, defaultTemperature = 22, 
         `THERMOSTAT_ID=${thermostatId}`,
         `DEFAULT_TEMPERATURE=${defaultTemperature}`,
         `ROOM_ID=${roomId}`,
+        `ROOM_TEMPERATURE=22`,
+        `REDUCED_TEMPERATURE=18`,
         `PORT=${hostPort}`
         
       ],

@@ -10,12 +10,10 @@
   
   <h1>SmartHome-Dashboard</h1>
   
-
   <section>
     <h2>Vorhandene Räume</h2>
-    
+    <!-- Räume werden hier angezeigt -->
   </section>
-
 
   <section>
     <h2>Vorhandene Geräte</h2>
@@ -31,23 +29,24 @@
       </thead>
       <tbody>
         <% devices.forEach(device => { %>
-          <tr>
+          <tr data-device-id="<%= device.deviceid %>" class="<%= device.type === 'thermostat' ? 'thermostat-row' : '' %>">
             <td><%= device.deviceid %></td>
             <td><%= device.type %></td>
             <td><%= device.roomid || '—' %></td>
             <td>
               <% if (device.type === 'thermostat') { %>
-                  <span><%= device.temperature || '—' %>°C</span><!--  -- meint das es noch nicht vorhanden ist -->
+                  <!-- Anzeige: heatingMode wird per Polling aktualisiert -->
+                  <span class="heating-mode">Stufe: –</span><!--  -- verändert zu der Stufe des Thermostats (0,1,2,3,4,5) -->
               <% } else if (device.type === 'fensterkontakt') { %>
                 <button onclick="moveWindow('<%= device.deviceid %>', 'up')">▲</button>
                 <button onclick="moveWindow('<%= device.deviceid %>', 'down')">▼</button>
               <% } else { %>
-                —
+                –
               <% } %>
             </td>
             <td>
               <!-- Lösch-Button hinzufügen -->
-                <button onclick="deleteDevice('<%= device.id %>')">🗑️ Löschen</button>
+              <button onclick="deleteDevice('<%= device.id %>')">🗑️ Löschen</button>
             </td>
           </tr>
         <% }) %>
@@ -79,30 +78,50 @@
 
   <script>
       function moveWindow(deviceId, direction) {
-        console.log(`Gerät \${deviceId} bewegt sich \${direction}`);
-      //muss noch erweitert werden
+        console.log(`Gerät ${deviceId} bewegt sich ${direction}`);
+        // muss noch erweitert werden
       }
 
       async function deleteDevice(deviceId) {
-    if (!confirm("Willst du dieses Gerät wirklich löschen?")) return;
-
-    try {
-      const response = await fetch(`/devices/${deviceId}`, {
-        method: 'DELETE'
-      });
-
-      if (response.ok) {
-        alert("Gerät erfolgreich gelöscht!");
-        location.reload(); // Seite neu laden, um das entfernte Gerät nicht mehr anzuzeigen
-      } else {
-        const errorText = await response.text();
-        alert("Fehler beim Löschen: " + errorText);
+        if (!confirm("Willst du dieses Gerät wirklich löschen?")) return;
+        try {
+          const response = await fetch(`/devices/${deviceId}`, { method: 'DELETE' });
+          if (response.ok) {
+            alert("Gerät erfolgreich gelöscht!");
+            location.reload(); // Seite neu laden, um das entfernte Gerät nicht mehr anzuzeigen
+          } else {
+            const errorText = await response.text();
+            alert("Fehler beim Löschen: " + errorText);
+          }
+        } catch (error) {
+          console.error("Fehler beim Löschen des Geräts:", error);
+          alert("Es gab ein Problem beim Löschen des Geräts.");
+        }
       }
-    } catch (error) {
-      console.error("Fehler beim Löschen des Geräts:", error);
-      alert("Es gab ein Problem beim Löschen des Geräts.");
-    }
-  }
+
+      // Diese Funktion holt den Status jedes Thermostats und aktualisiert den angezeigten heatingMode
+      async function updateThermostatStatuses() {
+        const rows = document.querySelectorAll('tr.thermostat-row');
+        for (const row of rows) {
+          const deviceId = row.getAttribute('data-device-id');
+          try {
+            const res = await fetch(`/thermostats/${deviceId}/status`);
+            if (res.ok) {
+              const data = await res.json();
+              if (row.querySelector('.heating-mode')) {
+                row.querySelector('.heating-mode').textContent = 'Stufe: ' + data.heatingMode;
+              }
+            }
+          } catch (err) {
+            console.error(`Fehler beim Aktualisieren des Status für Gerät ${deviceId}:`, err);
+          }
+        }
+      }
+
+      // Alle 5 Sekunden wird der Status aktualisiert
+      updateThermostatStatuses();
+      setInterval(updateThermostatStatuses, 5000);
   </script>
 </body>
 </html>
+

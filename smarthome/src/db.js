@@ -10,7 +10,8 @@ const pool = new Pool({
 });
 //Erstellt Tabelle devices falls diese nicht vorhanden ist
 async function initDb() {
-  const createTableSQL = `
+  // Tabelle devices für alle Geräte
+  const createDevicesTableSQL = `
     CREATE TABLE IF NOT EXISTS devices (
       id SERIAL PRIMARY KEY,
       deviceId INT NOT NULL,
@@ -18,11 +19,24 @@ async function initDb() {
       roomId TEXT
     )
   `;
+  // Tabelle rooms für raumbezogene Werte
+  const createRoomsTableSQL = `
+    CREATE TABLE IF NOT EXISTS rooms (
+      id SERIAL PRIMARY KEY,
+      roomId TEXT UNIQUE NOT NULL,
+      room_temperature NUMERIC DEFAULT 22,
+      reduced_temperature NUMERIC DEFAULT 18,
+      current_temperature NUMERIC DEFAULT 20
+    )
+  `;
+  
   try {
-    await pool.query(createTableSQL);
+    await pool.query(createDevicesTableSQL);
     console.log('Tabelle "devices" ist bereit (ggf. gerade erstellt).');
+    await pool.query(createRoomsTableSQL);
+    console.log('Tabelle "rooms" ist bereit (ggf. gerade erstellt).');
   } catch (err) {
-    console.error('Fehler beim Erstellen der Tabelle:', err);
+    console.error('Fehler beim Erstellen der Tabellen:', err);
   }
 }
 //wird benötigt damit die ersten beiden container in der datenbank sind
@@ -72,5 +86,5 @@ async function start() {
 
 start()
 module.exports = {
-  query: (text, params) => pool.query(text, params),
+  query: (text, params) => pool.query(text, params)
 };

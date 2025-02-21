@@ -3,117 +3,86 @@ const axios = require('axios');
 const router = express.Router();
 const deviceService = require('../services/deviceService');
 
-// "Fest" definierte Temperaturen (kannst du flexibel machen, z.B. in DB ablegen)
-const DEFAULT_NORMAL_TEMP = 22;
-const DEFAULT_REDUCED_TEMP = 18;
-
-/**
- * GET /thermostats
- * Gibt alle Geräte vom Typ "thermostat" zurück (JSON).
- */
+// GET /thermostats – List all thermostats
 router.get('/', async (req, res) => {
   try {
-    // Alle Geräte holen und filtern
     const thermostats = await deviceService.getThermostate();
     res.json(thermostats);
-  } catch (error) {
-    console.error('Fehler beim Abrufen der Thermostate:', error);
-    res.status(500).send('Serverfehler');
+  } catch (err) {
+    console.error('Error fetching thermostats:', err);
+    res.status(500).send('Server error');
   }
 });
 
-/**
- * GET /thermostats/:deviceId/status
- * Fragt den laufenden Thermostat-Container über HTTP an (z.B. http://thermostat_1:3001/status).
- */
+// GET /thermostats/:deviceId/status – Query the running thermostat container
 router.get('/:deviceId/status', async (req, res) => {
   const { deviceId } = req.params;
-
-  // 1) Prüfen, ob Device existiert und Thermostat ist
   const device = await deviceService.getDeviceByDeviceId(deviceId);
   if (!device) {
-    return res.status(404).json({ error: 'Thermostat nicht gefunden' });
+    return res.status(404).json({ error: 'Thermostat not found' });
   }
   if (device.type !== 'thermostat') {
-    return res.status(400).json({ error: 'Gerät ist kein Thermostat' });
+    return res.status(400).json({ error: 'Device is not a thermostat' });
   }
-
-  // 2) Container-Hostname und Port
+  // WICHTIG: Verwende 3000 + deviceId, da das in thermostatService so definiert ist
   const containerName = `web-service-thermostat-${deviceId}`;
-  const port = 300+deviceId; // Hardcodiert, falls Thermostat immer auf 3001 läuft
-
-  // 3) Versuch, den Container per HTTP GET /status abzufragen
+  const port = 3000 + Number(deviceId);
   try {
     const response = await axios.get(`http://${containerName}:${port}/status`);
-    res.json(response.data); 
-    // z.B. { thermostatId, roomId, currentTemperature, mode }
+    res.json(response.data);
   } catch (err) {
-    console.error('Fehler beim Abfragen des Thermostat-Status:', err.message);
-    res.status(500).json({ error: 'Thermostat nicht erreichbar' });
+    console.error('Error fetching thermostat status:', err.message);
+    res.status(500).json({ error: 'Thermostat unreachable' });
   }
 });
 
-/**
- * POST /thermostats/:deviceId/normal
- * Setzt den Thermostat auf Normaltemperatur (z.B. 22°C).
- */
+// POST /thermostats/:deviceId/normal – Set thermostat to normal mode  
+// (hier wird kein Temperaturwert übergeben, da der Thermostat die Raumwerte selbst aus der DB abruft)
 router.post('/:deviceId/normal', async (req, res) => {
   const { deviceId } = req.params;
-
   const device = await deviceService.getDeviceByDeviceId(deviceId);
   if (!device) {
-    return res.status(404).json({ error: 'Thermostat nicht gefunden' });
+    return res.status(404).json({ error: 'Thermostat not found' });
   }
   if (device.type !== 'thermostat') {
-    return res.status(400).json({ error: 'Gerät ist kein Thermostat' });
+    return res.status(400).json({ error: 'Device is not a thermostat' });
   }
-
   const containerName = `web-service-thermostat-${deviceId}`;
-  const port = 300+deviceId;
-
-  // "Normaltemperatur" an den Thermostat schicken
+  const port = 300 + Number(deviceId);
   try {
     const body = {
-      targetTemperature: DEFAULT_NORMAL_TEMP,
+      // Es wird kein Temperaturwert übergeben – der Thermostat holt seinen ROOM_TEMP selbst
       mode: 'normal'
     };
     const updateRes = await axios.post(`http://${containerName}:${port}/update`, body);
     res.json(updateRes.data);
   } catch (err) {
-    console.error('Fehler beim Setzen der Normaltemperatur:', err.message);
-    res.status(500).json({ error: 'Thermostat nicht erreichbar' });
+    console.error('Error setting normal mode:', err.message);
+    res.status(500).json({ error: 'Thermostat unreachable' });
   }
 });
 
-/**
- * POST /thermostats/:deviceId/reduced
- * Setzt den Thermostat auf Absenktemperatur (z.B. 18°C).
- */
+// POST /thermostats/:deviceId/reduced – Set thermostat to reduced mode
 router.post('/:deviceId/reduced', async (req, res) => {
   const { deviceId } = req.params;
-
   const device = await deviceService.getDeviceByDeviceId(deviceId);
   if (!device) {
-    return res.status(404).json({ error: 'Thermostat nicht gefunden' });
+    return res.status(404).json({ error: 'Thermostat not found' });
   }
   if (device.type !== 'thermostat') {
-    return res.status(400).json({ error: 'Gerät ist kein Thermostat' });
+    return res.status(400).json({ error: 'Device is not a thermostat' });
   }
-
   const containerName = `web-service-thermostat-${deviceId}`;
-  const port = 300+deviceId;
-
-  // "Absenktemperatur" an den Thermostat schicken
+  const port = 300 + Number(deviceId);
   try {
     const body = {
-      targetTemperature: DEFAULT_REDUCED_TEMP,
       mode: 'reduced'
     };
     const updateRes = await axios.post(`http://${containerName}:${port}/update`, body);
     res.json(updateRes.data);
   } catch (err) {
-    console.error('Fehler beim Setzen der Absenktemperatur:', err.message);
-    res.status(500).json({ error: 'Thermostat nicht erreichbar' });
+    console.error('Error setting reduced mode:', err.message);
+    res.status(500).json({ error: 'Thermostat unreachable' });
   }
 });
 

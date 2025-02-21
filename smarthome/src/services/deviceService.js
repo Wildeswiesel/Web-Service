@@ -33,7 +33,7 @@ function getFensterkontakte() {
 /**
  * Fügt ein neues Gerät hinzu und gibt die generierte ID zurück
  */
-function addDevice(deviceId, type, roomId) {
+async function addDevice(deviceId, type, roomId) {
   // "RETURNING id" gibt die neue ID gleich zurück
   const sql = `
     INSERT INTO devices (deviceId, type, roomId)
@@ -41,13 +41,26 @@ function addDevice(deviceId, type, roomId) {
     RETURNING id
   `;
   const params = [deviceId, type, roomId || null];
+  const result = await db.query(sql, params);
+  const newDeviceId = result.rows[0].id;
 
-  return db.query(sql, params)
-    .then((result) => {
-      // result.rows[0] enthält das eingefügte Objekt
-      // z.B. { id: 123 }
-      return result.rows[0].id;
-    });
+  if (roomId) {
+    const checkSql = 'SELECT * FROM rooms WHERE roomId = $1';
+    const checkResult = await db.query(checkSql, [roomId]);
+    if (checkResult.rows.length === 0) {
+      // Lege den Raum mit Standardwerten an:
+      // room_temperature: 22, reduced_temperature: 18, current_temperature: 20
+      const insertRoomSql = `
+        INSERT INTO rooms (roomId, room_temperature, reduced_temperature, current_temperature)
+        VALUES ($1, $2, $3, $4)
+      `;
+      const defaults = [roomId, 22, 18, 20];
+      await db.query(insertRoomSql, defaults);
+      console.log(`Room '${roomId}' created with default values.`);
+    }
+  }
+  
+  return newDeviceId;
 }
 
 /**

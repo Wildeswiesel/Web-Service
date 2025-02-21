@@ -24,13 +24,14 @@
         </thead>
         <tbody>
           <% devices.forEach(device => { %>
-            <tr>
+            <tr data-device-id="<%= device.deviceid %>" class="<%= device.type === 'thermostat' ? 'thermostat-row' : '' %>">
               <td><%= device.deviceid %></td>
               <td><%= device.type %></td>
               <td><%= device.roomid || '—' %></td>
               <td>
                 <% if (device.type === 'thermostat') { %>
-                    <span><%= device.temperature || '—' %>°C</span><!--  -- meint das es noch nicht vorhanden ist -->
+                    <!-- Anzeige: Stufe (heatingMode) wird dynamisch aktualisiert -->
+                    <span class="heating-mode">Stufe: –</span><!--  -- meint das es noch nicht vorhanden ist -->
                 <% } else if (device.type === 'fensterkontakt') { %>
                   <button onclick="moveWindow('<%= device.deviceid %>', 'up')">▲</button>
                   <button onclick="moveWindow('<%= device.deviceid %>', 'down')">▼</button>
@@ -43,5 +44,38 @@
         </tbody>
       </table>
     </section>
+
+    <script>
+      // Funktion zum Abrufen des Status eines Thermostats
+      async function fetchThermostatStatus(deviceId) {
+        try {
+          const res = await fetch(`/thermostats/${deviceId}/status`);
+          if (res.ok) {
+            return await res.json();
+          } else {
+            console.error(`Fehler beim Abrufen des Status für Gerät ${deviceId}`);
+          }
+        } catch (err) {
+          console.error(`Fehler beim Abrufen des Status für Gerät ${deviceId}:`, err);
+        }
+        return null;
+      }
+
+      // Aktualisiert alle Thermostat-Zeilen im Wohnzimmer-Dashboard
+      async function updateThermostatStatuses() {
+        const rows = document.querySelectorAll('tr.thermostat-row');
+        for (const row of rows) {
+          const deviceId = row.getAttribute('data-device-id');
+          const status = await fetchThermostatStatus(deviceId);
+          if (status && row.querySelector('.heating-mode')) {
+            row.querySelector('.heating-mode').textContent = 'Stufe: ' + status.heatingMode;
+          }
+        }
+      }
+
+      // Alle 5 Sekunden den Status aktualisieren
+      updateThermostatStatuses();
+      setInterval(updateThermostatStatuses, 5000);
+    </script>
 </body>
 </html>
