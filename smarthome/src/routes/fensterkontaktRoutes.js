@@ -53,7 +53,7 @@ router.post('/:deviceId/closed', async (req, res) => {
     return res.status(400).json({ error: 'Gerät ist kein Fensterkontakt' });
   }
 
-  const containerName = `web-service-fensterkonakt-${deviceId}`;
+  const containerName = `web-service-fensterkontakt-${deviceId}`;
   const port = 3008+deviceId; //ggf noch Port umändern
 
   // "Geschlossener Modus" an Fensterkontakt schicken
@@ -81,7 +81,7 @@ router.post('/:deviceId/open', async (req, res) => {
   if (!device) {
     return res.status(404).json({ error: 'Fensterkontakt nicht gefunden' });
   }
-  if (device.type !== 'fensterkonakt') {
+  if (device.type !== 'fensterkontakt') {
     return res.status(400).json({ error: 'Gerät ist kein Fensterkontakt' });
   }
 

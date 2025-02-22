@@ -1,7 +1,7 @@
 const Docker = require('dockerode');      
 const docker = new Docker({ socketPath: '/var/run/docker.sock' });
 
- // Erstellt einen neuen Fenstekontakt-Container mit der übergebenen numerischen ID, einem Startzustand (Standard: 'closed') und optionaler Raumzuordnung.
+ // Erstellt einen neuen Fensterkontakt-Container mit der übergebenen numerischen ID, einem Startzustand (Standard: 'closed') und optionaler Raumzuordnung.
 // src/services/fensterkontaktService.js
 
 async function createFensterkontaktContainer(deviceId, defaultMode = 'closed', roomId = '') {
