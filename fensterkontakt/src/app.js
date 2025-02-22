@@ -7,7 +7,7 @@ const roomId = process.env.ROOM_ID || 'none';
 
 let windowContacts = {}; // Speichert registrierte Fensterkontakte
 
-const windowContactId = process.env.FENSTERKONTAKT_ID || '0';
+const windowContactId = process.env.FENSTERKONTAKT_ID || '1';
 
 let mode = 'closed'; // Fensterzustand: 'closed', 'open'
 
@@ -71,10 +71,11 @@ app.get('/contacts', (req, res) => {
     res.send(windowContacts);
 });
 
+
 // UI für Fenstersteuerung
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'src', 'index.ejs'));
-});
+//app.get('/', (req, res) => {
+//    res.sendFile(path.join(__dirname, 'src', 'index.ejs'));
+//}); 
 
 app.listen(port, () => {
     console.log(`Fensterkontakt (Raum: ${roomId}) läuft auf Port ${port}`);
