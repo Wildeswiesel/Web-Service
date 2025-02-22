@@ -24,6 +24,7 @@ let heatingMode = 0;
 
 // Array für sseClients = [];
 let sseClients = [];
+let previousError = 0;
 
 // SSE-Endpoint: Clients verbinden sich hier, um kontinuierlich Updates zu erhalten
 app.get('/events', (req, res) => {
@@ -77,51 +78,65 @@ async function updateRoomCurrentTemperature() {
 
 // updateHeatingMode() ohne Rekursion – berechnet den heatingMode und passt currentTemperature an
 function updateHeatingMode() {
-  if (windowStatus === 'open') {   
-    currentTemperature -= 0.15;                 
-    let error = currentTemperature - reducedTemperature;
-    if (error >= 0) {
-      heatingMode = 0;
-    } else if (error < -0.1 && error >= -0.5) {
-      heatingMode = 1;
-      currentTemperature += 0.01;
-    } else if (error < -0.5 && error >= -1) {
-      heatingMode = 2;
-      currentTemperature += 0.05;
-    } else if (error < -1 && error >= -1.5) {
-      heatingMode = 3;
-      currentTemperature += 0.1;
-    } else if (error < -1.5 && error >= -3) {
-      heatingMode = 4;
-      currentTemperature += 0.5;
-    } else if (error < -3) {
-      heatingMode = 5;
-      currentTemperature += 1;
-    }
-  } else if (windowStatus === 'closed') {
-    currentTemperature -= 0.001;
-    let error = roomTemperature - currentTemperature;
-    if (error <= 0) {
-      heatingMode = 0;
-    } else if (error > 0 && error <= 0.5) {
-      heatingMode = 1;
-      currentTemperature += 0.01;
-    } else if (error > 0.5 && error <= 1) {
-      heatingMode = 2;
-      currentTemperature += 0.05;
-    } else if (error > 1 && error <= 1.5) {
-      heatingMode = 3;
-      currentTemperature += 0.1;
-    } else if (error > 1.5 && error <= 3) {
-      heatingMode = 4;
-      currentTemperature += 0.5;
-    } else if (error > 3) {
-      heatingMode = 5;
-      currentTemperature += 1;
-    }
+  // Zielwert: Bei offenem Fenster reducedTemperature, bei geschlossenem Fenster roomTemperature (also 22°C)
+  const target = (windowStatus === 'open') ? reducedTemperature : roomTemperature;
+  
+  // Kontinuierliche Abkühlung:
+  // Bei offenem Fenster stärker, bei geschlossenem Fenster moderat
+  const coolingRate = (windowStatus === 'open') ? 0.15 : 0.005;
+  currentTemperature -= coolingRate;
+  
+  // Berechne den Fehler (Differenz zwischen Ziel und aktueller Temperatur)
+  const error = target - currentTemperature;
+  // Berechne die Ableitung (Änderung des Fehlers)
+  const derivative = error - previousError;
+  previousError = error;
+  
+  // Kombiniere error und derivative zu einem Steuerwert.
+  // Wähle Kd so, dass auch bei kleinen Fehlern ein angemessener controlSignal-Wert herauskommt.
+  const Kd = 0.5;
+  const controlSignal = error + Kd * derivative;
+  
+  // Bestimme den heatingMode anhand des controlSignal.
+  // Hier passen wir die Schwellenwerte an, sodass bereits ein kleiner positiver Fehler (z. B. ca. 0,1–0,3) zu heatingMode 2 führt.
+  if (controlSignal <= 0) {
+    heatingMode = 0;
+  } else if (controlSignal <= 0.1) {
+    heatingMode = 1;
+  } else if (controlSignal <= 0.3) {
+    heatingMode = 2;  // gewünschter Bereich
+  } else if (controlSignal <= 0.6) {
+    heatingMode = 3;
+  } else if (controlSignal <= 1.0) {
+    heatingMode = 4;
+  } else {
+    heatingMode = 5;
   }
-   // Sende das Update per SSE an alle verbundenen Clients:
-   sendSSEEvent({ thermostatId, roomId, currentTemperature, roomTemperature, reducedTemperature, heatingMode, windowStatus });
+  
+  // Dynamischer Faktor: Je höher currentTemperature im Vergleich zu roomTemperature, desto weniger effektiv ist das Heizen.
+  const maxDelta = 10; // Bei einem Unterschied von 10°C soll der Faktor mindestens 0.1 betragen
+  let reductionFactor = 1;
+  if (currentTemperature > roomTemperature) {
+    reductionFactor = Math.max(0.1, 1 - ((currentTemperature - roomTemperature) / maxDelta));
+  }
+  
+  // Basis-Heiz-Inkremente abhängig vom heatingMode
+  let baseIncrement = 0;
+  switch (heatingMode) {
+    case 1: baseIncrement = 0.01; break;
+    case 2: baseIncrement = 0.05; break;
+    case 3: baseIncrement = 0.1; break;
+    case 4: baseIncrement = 0.15; break;
+    case 5: baseIncrement = 0.5; break;
+    default: baseIncrement = 0;
+  }
+  
+  // Effektives Heiz-Inkrement:
+  const heatingIncrement = baseIncrement * reductionFactor;
+  currentTemperature += heatingIncrement;
+  
+  // Sende das Update per SSE an alle verbundenen Clients:
+  sendSSEEvent({ thermostatId, roomId, currentTemperature, roomTemperature, reducedTemperature, heatingMode, windowStatus });
 }
 
 // Diese Funktion wird alle 1000ms asynchron aufgerufen:
