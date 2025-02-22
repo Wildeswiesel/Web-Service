@@ -64,20 +64,23 @@ app.get('/wohnzimmer', async (req, res) => {
 });
 
 // POST-Formular (aus index.ejs)
+// src/app.js
+
+// src/app.js
+
 app.post('/register', async (req, res) => {
-  const { deviceId, type, roomId } = req.body;
-  if (!deviceId || !type) {
+  const { type, roomId } = req.body;
+  if (!type) {
     console.log('Empfangener type:', type);
-    return res.status(400).send('deviceId und type sind Pflichtfelder');
+    return res.status(400).send('type ist ein Pflichtfeld');
   }
 
   try {
-    const newId = await deviceService.addDevice(deviceId, type, roomId);  //für die Thermostate
+    const deviceId = await deviceService.addDevice(type, roomId); // Verwende deviceId hier
     if (type === 'thermostat') {
-      await thermostatService.createThermostatContainer(Number(deviceId), 22, roomId);
-    }
-    else if (type === 'fensterkontakt') {
-      await fensterkontaktService.createFensterkontaktContainer(Number(deviceId), 'closed', roomId);
+      await thermostatService.createThermostatContainer(deviceId, 22, roomId);
+    } else if (type === 'fensterkontakt') {
+      await fensterkontaktService.createFensterkontaktContainer(deviceId, 'closed', roomId);
     }
 
     res.redirect('/');
@@ -86,6 +89,7 @@ app.post('/register', async (req, res) => {
     res.status(500).send('Gerät konnte nicht angelegt werden');
   }
 });
+
 
 app.delete('/devices/:id', async (req, res) => {
   const { id } = req.params;

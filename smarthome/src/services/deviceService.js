@@ -33,23 +33,31 @@ function getFensterkontakte() {
 /**
  * Fügt ein neues Gerät hinzu und gibt die generierte ID zurück
  */
-async function addDevice(deviceId, type, roomId) {
-  // "RETURNING id" gibt die neue ID gleich zurück
+// src/services/deviceService.js
+
+async function addDevice(type, roomId) {
+  // 1. Hole die höchste vorhandene deviceId
+  const result = await db.query('SELECT MAX(deviceId::INTEGER) FROM devices');
+  const maxDeviceId = result.rows[0]?.max || 0;  // Falls keine Einträge existieren, setze auf 0
+  const deviceId = maxDeviceId + 1;  // Jetzt erfolgt die numerische Addition
+  console.log("Neue deviceId:", deviceId);
+  
+  // 2. Gerät in die DB einfügen
   const sql = `
     INSERT INTO devices (deviceId, type, roomId)
     VALUES ($1, $2, $3)
     RETURNING id
   `;
   const params = [deviceId, type, roomId || null];
-  const result = await db.query(sql, params);
-  const newDeviceId = result.rows[0].id;
+  const insertResult = await db.query(sql, params);
+  const newDeviceDbId = insertResult.rows[0].id;
 
   if (roomId) {
+    // Überprüfe, ob der Raum bereits existiert
     const checkSql = 'SELECT * FROM rooms WHERE roomId = $1';
     const checkResult = await db.query(checkSql, [roomId]);
     if (checkResult.rows.length === 0) {
-      // Lege den Raum mit Standardwerten an:
-      // room_temperature: 22, reduced_temperature: 18, current_temperature: 20
+      // Lege den Raum mit Standardwerten an
       const insertRoomSql = `
         INSERT INTO rooms (roomId, room_temperature, reduced_temperature, current_temperature)
         VALUES ($1, $2, $3, $4)
@@ -59,9 +67,10 @@ async function addDevice(deviceId, type, roomId) {
       console.log(`Room '${roomId}' created with default values.`);
     }
   }
-  
-  return newDeviceId;
+
+  return deviceId; // Rückgabe der automatisch generierten deviceId
 }
+
 
 /**
  * Suche Gerät nach deviceId
