@@ -212,9 +212,22 @@
     updateThermostatStatuses();
     setInterval(updateThermostatStatuses, 5000);
 
+    //Soll nun die Funktion zum öffnen bzw schließen des Fensters beim Knopfdruck ausführen
     function moveWindow(deviceId, direction) {
       console.log(`Gerät ${deviceId} bewegt sich ${direction}`);
-      // muss noch erweitert werden
+      try {
+        if (direction == 'up') {
+          const {setClosed} = require('./fensterkontakt.ejs');
+          setClosed(deviceId)
+        }
+        else if (direction == 'down') {
+          const {setOpen} = require('./fensterkontakt.ejs')
+          setOpen(deviceId)
+        }
+      }
+      catch (err) {
+        console.error(`Fehler beim Aktualisieren des Gerätes: ${deviceId}`, err)
+      }
     }
   </script>
 </body>
