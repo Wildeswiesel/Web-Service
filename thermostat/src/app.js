@@ -3,9 +3,6 @@ const { Pool } = require('pg');
 const app = express();
 app.use(express.json());
 
-const thermostatId = process.env.THERMOSTAT_ID || '1';
-const roomId = process.env.ROOM_ID || 'none';
-
 // Datenbankverbindung
 const pool = new Pool({
   user: process.env.PGUSER || 'postgres',
@@ -15,14 +12,15 @@ const pool = new Pool({
   port: process.env.PGPORT || 5432
 });
 
-// Initiale Werte; diese werden sofort aus der DB überschrieben
+const thermostatId = process.env.THERMOSTAT_ID || '1';
+const roomId = process.env.ROOM_ID || 'none';
+
 let currentTemperature = 22;
 let roomTemperature = 22;
 let reducedTemperature = 18;
-let windowStatus = 'closed';  // Für den Moment immer 'closed' 
+let windowStatus = 'closed';  // Für den Moment immer 'closed'
 let heatingMode = 0;
 
-// Array für sseClients = [];
 let sseClients = [];
 let previousError = 0;
 
@@ -50,15 +48,13 @@ function sendSSEEvent(data) {
 // Liest die Raumwerte aus der Tabelle rooms für den gegebenen roomId
 async function fetchRoomValues() {
   try {
-    const res = await pool.query(
+    const { rows: [row] } = await pool.query(
       'SELECT room_temperature, reduced_temperature, current_temperature FROM rooms WHERE roomId = $1',
       [roomId]
     );
-    if (res.rows.length > 0) {
-      roomTemperature = Number(res.rows[0].room_temperature);
-      reducedTemperature = Number(res.rows[0].reduced_temperature);
-      currentTemperature = Number(res.rows[0].current_temperature);
-    }
+    roomTemperature = Number(row.room_temperature);
+    reducedTemperature = Number(row.reduced_temperature);
+    currentTemperature = Number(row.current_temperature);
   } catch (err) {
     console.error('Error fetching room values:', err);
   }
@@ -76,35 +72,24 @@ async function updateRoomCurrentTemperature() {
   }
 }
 
-// updateHeatingMode() ohne Rekursion – berechnet den heatingMode und passt currentTemperature an
 function updateHeatingMode() {
-  // Zielwert: Bei offenem Fenster reducedTemperature, bei geschlossenem Fenster roomTemperature (also 22°C)
   const target = (windowStatus === 'open') ? reducedTemperature : roomTemperature;
-  
-  // Kontinuierliche Abkühlung:
-  // Bei offenem Fenster stärker, bei geschlossenem Fenster moderat
-  const coolingRate = (windowStatus === 'open') ? 0.15 : 0.005;
+  const coolingRate = (windowStatus === 'open') ? 0.30 : 0.015;
   currentTemperature -= coolingRate;
-  
-  // Berechne den Fehler (Differenz zwischen Ziel und aktueller Temperatur)
+  // Fehler und Ableitung berechnen:
   const error = target - currentTemperature;
-  // Berechne die Ableitung (Änderung des Fehlers)
-  const derivative = error - previousError;
+  const errorRate = error - previousError;
   previousError = error;
   
-  // Kombiniere error und derivative zu einem Steuerwert.
-  // Wähle Kd so, dass auch bei kleinen Fehlern ein angemessener controlSignal-Wert herauskommt.
-  const Kd = 0.5;
-  const controlSignal = error + Kd * derivative;
+  // Kombiniere error und errorRate in einem Steuerwert:
+  const controlSignal = error + 0.5 * errorRate;
   
-  // Bestimme den heatingMode anhand des controlSignal.
-  // Hier passen wir die Schwellenwerte an, sodass bereits ein kleiner positiver Fehler (z. B. ca. 0,1–0,3) zu heatingMode 2 führt.
   if (controlSignal <= 0) {
     heatingMode = 0;
   } else if (controlSignal <= 0.1) {
     heatingMode = 1;
   } else if (controlSignal <= 0.3) {
-    heatingMode = 2;  // gewünschter Bereich
+    heatingMode = 2;
   } else if (controlSignal <= 0.6) {
     heatingMode = 3;
   } else if (controlSignal <= 1.0) {
@@ -114,13 +99,12 @@ function updateHeatingMode() {
   }
   
   // Dynamischer Faktor: Je höher currentTemperature im Vergleich zu roomTemperature, desto weniger effektiv ist das Heizen.
-  const maxDelta = 10; // Bei einem Unterschied von 10°C soll der Faktor mindestens 0.1 betragen
   let reductionFactor = 1;
   if (currentTemperature > roomTemperature) {
-    reductionFactor = Math.max(0.1, 1 - ((currentTemperature - roomTemperature) / maxDelta));
+    reductionFactor = Math.max(0.1, 1 - ((currentTemperature - roomTemperature) / 10));
   }
   
-  // Basis-Heiz-Inkremente abhängig vom heatingMode
+  // Basis-Heiz-Inkremente je heatingMode:
   let baseIncrement = 0;
   switch (heatingMode) {
     case 1: baseIncrement = 0.01; break;
@@ -131,7 +115,6 @@ function updateHeatingMode() {
     default: baseIncrement = 0;
   }
   
-  // Effektives Heiz-Inkrement:
   const heatingIncrement = baseIncrement * reductionFactor;
   currentTemperature += heatingIncrement;
   
@@ -141,9 +124,9 @@ function updateHeatingMode() {
 
 // Diese Funktion wird alle 1000ms asynchron aufgerufen:
 setInterval(async () => {
-  await fetchRoomValues();      // Lese aktuelle Werte aus der DB
-  updateHeatingMode();          // Berechne heatingMode und passe currentTemperature an
-  await updateRoomCurrentTemperature(); // Schreibe den neuen currentTemperature-Wert in die DB
+  await fetchRoomValues();
+  updateHeatingMode();
+  await updateRoomCurrentTemperature();
 }, 1000);
 
 // Endpunkt, um den Status abzurufen
@@ -159,7 +142,7 @@ app.get('/status', (req, res) => {
   });
 });
 
-// Mit /update kann man manuell Werte setzen und dadurch den heatingMode neu berechnen
+// Mit /update können manuell Werte gesetzt werden:
 app.post('/update', async (req, res) => {
   const { currentTemp, roomTemp, reducedTemp, window } = req.body;
   if (currentTemp !== undefined) {
@@ -172,7 +155,6 @@ app.post('/update', async (req, res) => {
     reducedTemperature = Number(reducedTemp);
   }
   if (window !== undefined) {
-    // Hier könntest Du später auch den Fensterstatus aktualisieren (open/closed)
     windowStatus = window;
   }
   updateHeatingMode();
@@ -193,6 +175,3 @@ const port = process.env.PORT || 3001;
 app.listen(port, () => {
   console.log(`Thermostat ${thermostatId} (room: ${roomId}) running on port ${port}`);
 });
-
-
-

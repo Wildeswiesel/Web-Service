@@ -1,6 +1,5 @@
-//anmelde Funktion
 const { Pool } = require('pg');
-//anmelde Daten
+
 const pool = new Pool({
   user: process.env.PGUSER || 'postgres',
   host: process.env.PGHOST || 'db',
@@ -8,9 +7,9 @@ const pool = new Pool({
   password: process.env.PGPASSWORD || 'secret',
   port: 5432,
 });
-//Erstellt Tabelle devices falls diese nicht vorhanden ist
+
+// Tabelle devices für alle Geräte
 async function initDb() {
-  // Tabelle devices für alle Geräte
   const createDevicesTableSQL = `
     CREATE TABLE IF NOT EXISTS devices (
       id SERIAL PRIMARY KEY,
@@ -26,7 +25,7 @@ async function initDb() {
       roomId TEXT UNIQUE NOT NULL,
       room_temperature NUMERIC DEFAULT 22,
       reduced_temperature NUMERIC DEFAULT 18,
-      current_temperature NUMERIC DEFAULT 20
+      current_temperature NUMERIC DEFAULT 22
     )
   `;
   
@@ -39,52 +38,122 @@ async function initDb() {
     console.error('Fehler beim Erstellen der Tabellen:', err);
   }
 }
-//wird benötigt damit die ersten beiden container in der datenbank sind
-async function addDevice(deviceId, type, roomId) {
-  try {
-    // 1️⃣ Prüfen, ob das Gerät bereits existiert
-    const checkQuery = `
-      SELECT * FROM devices WHERE deviceId = $1 AND type = $2 AND roomId = $3;
-    `;
-    const checkResult = await pool.query(checkQuery, [deviceId, type, roomId]);
 
-    if (checkResult.rows.length > 0) {
-      console.log(`⚠️ Gerät (${deviceId}, ${type}, ${roomId}) existiert bereits.`);
-      return checkResult.rows[0]; // Bestehendes Gerät zurückgeben
+// Fügt ein neues Gerät hinzu und legt (falls nötig) den Raum an
+async function addDevice(type, roomId) {
+  // Falls ein Raum angegeben wurde, prüfen und ggf. anlegen:
+  if (roomId) {
+    const checkRoomSql = 'SELECT * FROM rooms WHERE roomId = $1';
+    const checkRoomResult = await pool.query(checkRoomSql, [roomId]);
+    if (checkRoomResult.rows.length === 0) {
+      const insertRoomSql = `
+        INSERT INTO rooms (roomId, room_temperature, reduced_temperature, current_temperature)
+        VALUES ($1, 22, 18, 22)
+      `;
+      await pool.query(insertRoomSql, [roomId]);
+      console.log(`Room '${roomId}' created with default values.`);
     }
+  }
 
-    // 2️⃣ Falls nicht vorhanden, füge das Gerät hinzu
+  try {
+    // Prüfen, ob bereits ein Gerät mit diesem Typ und Raum existiert
+    const checkQuery = `
+      SELECT * FROM devices WHERE type = $1 AND roomId = $2;
+    `;
+    const checkResult = await pool.query(checkQuery, [type, roomId]);
+    if (checkResult.rows.length > 0) {
+      console.log(`⚠️ Gerät (${type}, ${roomId}) existiert bereits.`);
+      // Gebe deviceId des bereits existierenden Geräts zurück
+      return checkResult.rows[0].deviceid;
+    }
+    // Falls nicht vorhanden, füge das Gerät hinzu – deviceId wird automatisch generiert.
     const insertQuery = `
       INSERT INTO devices (deviceId, type, roomId) 
-      VALUES ($1, $2, $3) 
-      RETURNING *;
+      VALUES (DEFAULT, $1, $2) 
+      RETURNING deviceId;
     `;
-
-    const result = await pool.query(insertQuery, [deviceId, type, roomId]);
+    const result = await pool.query(insertQuery, [type, roomId]);
     console.log('✅ Gerät erfolgreich hinzugefügt:', result.rows[0]);
-
-    return result.rows[0];
-
+    return result.rows[0].deviceid;
   } catch (err) {
     console.error('❌ Fehler beim Einfügen des Geräts:', err.message);
     throw err;
   }
 }
 
+async function getAllDevices() {
+  const result = await pool.query('SELECT * FROM devices');
+  return result.rows;
+}
+
+async function getWohnzimmerDevices() {
+  const result = await pool.query("SELECT * FROM devices WHERE roomId ILIKE 'wohnzimmer'");
+  return result.rows;
+}
+
+async function getThermostate() {
+  const result = await pool.query("SELECT * FROM devices WHERE type='thermostat'");
+  return result.rows;
+}
+
+async function getFensterkontakte() {
+  const result = await pool.query("SELECT * FROM devices WHERE type='fensterkontakt'");
+  return result.rows;
+}
+
+async function getDeviceByDeviceId(deviceId) {
+  const sql = 'SELECT * FROM devices WHERE deviceId = $1';
+  const result = await pool.query(sql, [deviceId]);
+  return result.rows[0];
+}
+
+async function deleteDevice(id) {
+  const sql = 'DELETE FROM devices WHERE id = $1';
+  const result = await pool.query(sql, [id]);
+  return result.rowCount;
+}
+
+async function getRoomValues(roomId) {
+  const sql = 'SELECT room_temperature, reduced_temperature, current_temperature FROM rooms WHERE roomId = $1';
+  const result = await pool.query(sql, [roomId]);
+  return result.rows[0];
+}
+
+async function updateRoomTemperature(roomId, room_temperature) {
+  const sql = 'UPDATE rooms SET room_temperature = $1 WHERE roomId = $2';
+  await pool.query(sql, [Number(room_temperature), roomId]);
+}
+
+async function updateReducedTemperature(roomId, reduced_temperature) {
+  const sql = 'UPDATE rooms SET reduced_temperature = $1 WHERE roomId = $2';
+  await pool.query(sql, [Number(reduced_temperature), roomId]);
+}
+
 async function start() {
   try {
-    await initDb();  // Stellt sicher, dass die Tabelle erstellt wird, bevor Geräte eingefügt werden
+    await initDb();
     console.log("✅ Datenbank-Initialisierung abgeschlossen.");
-
-    await addDevice(1, 'thermostat', 'Wohnzimmer');
-    await addDevice(1, 'fensterkontakt', 'Wohnzimmer'); // Achte darauf, dass deviceId nicht doppelt ist
+    // Initial-Geräte hinzufügen (falls noch nicht vorhanden)
+    await addDevice('thermostat', 'Wohnzimmer');
+    await addDevice('fensterkontakt', 'Wohnzimmer');
     console.log("✅ Geräte wurden erfolgreich hinzugefügt.");
   } catch (err) {
     console.error("❌ Fehler während der Initialisierung:", err);
   }
 }
 
-start()
+start();
+
 module.exports = {
-  query: (text, params) => pool.query(text, params)
+  query: (text, params) => pool.query(text, params),
+  addDevice,
+  getAllDevices,
+  getWohnzimmerDevices,
+  getThermostate,
+  getFensterkontakte,
+  getDeviceByDeviceId,
+  deleteDevice,
+  getRoomValues,
+  updateRoomTemperature,
+  updateReducedTemperature
 };

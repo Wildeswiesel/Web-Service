@@ -126,6 +126,20 @@ async function deleteDevice(id) {
   }
 }
 
+async function getRoomValues(roomId) {
+  const sql = 'SELECT room_temperature, reduced_temperature, current_temperature FROM rooms WHERE roomId = $1';
+  const result = await db.query(sql, [roomId]);
+  return result.rows[0];
+}
+
+async function updateRoomTemperature(roomId, room_temperature) {
+  return db.updateRoomTemperature(roomId, room_temperature);
+}
+
+async function updateReducedTemperature(roomId, reduced_temperature) {
+  return db.updateReducedTemperature(roomId, reduced_temperature);
+}
+
 
 module.exports = {
   getAllDevices,
@@ -135,4 +149,7 @@ module.exports = {
   addDevice,
   getDeviceByDeviceId,
   deleteDevice,
+  getRoomValues,
+  updateRoomTemperature,
+  updateReducedTemperature
 };

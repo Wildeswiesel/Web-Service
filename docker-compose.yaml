@@ -52,6 +52,7 @@ services:
     environment:
       PORT: 3001
       DEFAULT_TEMPERATURE: 22
+      ROOM_ID: "Wohnzimmer"
   
   fensterkontakt:
     build:

@@ -24,8 +24,6 @@
               <strong>Thermostat #${t.deviceid}:</strong>
               <br>DeviceID: ${t.deviceid}, Room: ${t.roomid || '—'}
               <br>
-              <button onclick="setNormal('${t.deviceid}')">Normal</button>
-              <button onclick="setReduced('${t.deviceid}')">Absenk</button>
               <button onclick="getStatus('${t.deviceid}')">Status</button>
               <pre id="status_${t.deviceid}"></pre>
             </div>
@@ -38,25 +36,8 @@
       }
     }
 
-    async function setNormal(deviceId) {
-      try {
-        const res = await fetch(`/thermostats/${deviceId}/normal`, { method: 'POST' });
-        const data = await res.json();
-        alert(`Normaltemperatur gesetzt:\n${JSON.stringify(data)}`);
-      } catch (err) {
-        alert('Fehler beim Setzen der Normaltemperatur');
-      }
-    }
-
-    async function setReduced(deviceId) {
-      try {
-        const res = await fetch(`/thermostats/${deviceId}/reduced`, { method: 'POST' });
-        const data = await res.json();
-        alert(`Absenktemperatur gesetzt:\n${JSON.stringify(data)}`);
-      } catch (err) {
-        alert('Fehler beim Setzen der Absenktemperatur');
-      }
-    }
+    // man könnten den folgenden Endpunkt noch benutzen app.post('/update' mit den Feldern: currentTemp, roomTemp, reducedTemp, window ) 
+    // aber eigentlich würde ich die thermostate einfach automatisch laufen lasen und diesen Endpunkt nur für die Fenster dann benutzen
 
     async function getStatus(deviceId) {
       try {

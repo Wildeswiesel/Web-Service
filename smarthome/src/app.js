@@ -1,12 +1,11 @@
-// src/app.js
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
-const deviceService = require('./services/deviceService'); // z.B. für serverseitiges Rendering
-const thermostatService = require('./services/thermostatService'); // für die Thermostate
+const deviceService = require('./services/deviceService');
+const thermostatService = require('./services/thermostatService');
 const thermostatRoutes = require('./routes/thermostatRoutes');
-const fensterkontaktService = require('./services/fensterkontaktService'); // für die Fenster
-const fensterkontaktRoutes = require('./routes/fensterkontaktRoutes') // Fensterkontakt routen
+const fensterkontaktService = require('./services/fensterkontaktService');
+const fensterkontaktRoutes = require('./routes/fensterkontaktRoutes');
 
 const app = express();
 
@@ -48,8 +47,8 @@ app.get('/fensterkontakt', async (req, res) => {
   try {
     res.render('fensterkontakt');
   } catch (err) {
-    console.error('Fehler beim Laden der Geräte:', err)
-    res.status(500).send('Serverfehler')
+    console.error('Fehler beim Laden der Geräte:', err);
+    res.status(500).send('Serverfehler');
   }
 });
 
@@ -63,26 +62,57 @@ app.get('/wohnzimmer', async (req, res) => {
   }
 });
 
-// POST-Formular (aus index.ejs)
-// src/app.js
+// GET Room Status (z.B. /room/Wohnzimmer/status)
+app.get('/room/:roomId/status', async (req, res) => {
+  const { roomId } = req.params;
+  try {
+    const result = await deviceService.getRoomValues(roomId);
+    res.json(result);
+  } catch (err) {
+    console.error('Error fetching room status:', err);
+    res.status(500).send('Server error');
+  }
+});
 
-// src/app.js
+// POST Room Update: Aktualisiere die Raumtemperatur
+app.post('/room/:roomId/updateRoomTemperature', async (req, res) => {
+  const { roomId } = req.params;
+  const { room_temperature } = req.body;
+  try {
+    await deviceService.updateRoomTemperature(roomId, room_temperature);
+    res.send('Room temperature updated');
+  } catch (err) {
+    console.error('Error updating room temperature:', err);
+    res.status(500).send('Server error');
+  }
+});
 
+// POST Room Update: Aktualisiere die Absenktemperatur
+app.post('/room/:roomId/updateReducedTemperature', async (req, res) => {
+  const { roomId } = req.params;
+  const { reduced_temperature } = req.body;
+  try {
+    await deviceService.updateReducedTemperature(roomId, reduced_temperature);
+    res.send('Reduced temperature updated');
+  } catch (err) {
+    console.error('Error updating reduced temperature:', err);
+    res.status(500).send('Server error');
+  }
+});
+
+// POST Registrierung eines neuen Geräts
 app.post('/register', async (req, res) => {
   const { type, roomId } = req.body;
   if (!type) {
-    console.log('Empfangener type:', type);
     return res.status(400).send('type ist ein Pflichtfeld');
   }
-
   try {
-    const deviceId = await deviceService.addDevice(type, roomId); // Verwende deviceId hier
+    const deviceId = await deviceService.addDevice(type, roomId);
     if (type === 'thermostat') {
       await thermostatService.createThermostatContainer(deviceId, 22, roomId);
     } else if (type === 'fensterkontakt') {
       await fensterkontaktService.createFensterkontaktContainer(deviceId, 'closed', roomId);
     }
-
     res.redirect('/');
   } catch (err) {
     console.error('Fehler beim Hinzufügen eines Geräts:', err);
@@ -90,13 +120,10 @@ app.post('/register', async (req, res) => {
   }
 });
 
-
 app.delete('/devices/:id', async (req, res) => {
   const { id } = req.params;
-  
   try {
     const rowsDeleted = await deviceService.deleteDevice(id);
-    
     if (rowsDeleted > 0) {
       res.status(200).send("Gerät gelöscht");
     } else {
@@ -107,7 +134,6 @@ app.delete('/devices/:id', async (req, res) => {
     res.status(500).send("Interner Serverfehler");
   }
 });
-
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
