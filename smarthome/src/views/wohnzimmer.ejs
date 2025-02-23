@@ -217,12 +217,12 @@
       console.log(`Gerät ${deviceId} bewegt sich ${direction}`);
       try {
         if (direction == 'up') {
-          const {setClosed} = require('./fensterkontakt.ejs');
-          setClosed(deviceId)
+          const {setOpen} = require('./fensterkontakt.ejs');
+          setOpen(deviceId)
         }
         else if (direction == 'down') {
-          const {setOpen} = require('./fensterkontakt.ejs')
-          setOpen(deviceId)
+          const {setClosed} = require('./fensterkontakt.ejs')
+          setClosed(deviceId)
         }
       }
       catch (err) {
