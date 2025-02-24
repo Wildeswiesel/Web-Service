@@ -1,9 +1,17 @@
 <header>
-    <nav>
-      <a href="/">Home</a>| 
-      <a href="/wohnzimmer">Wohnzimmer</a>| 
-      <a href="/thermostat">Thermostate</a>|
-      <a href="/fensterkontakt">Fensterkontakt</a>
-    </nav>
-  </header>
-  
+  <nav>
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#">Räume ▾</a>
+        <ul class="dropdown-menu">
+          <% rooms.forEach(room => { %>
+            <li><a href="/<%= room.roomid %>"><%= room.roomid %></a></li>
+          <% }) %>
+        </ul>
+      </li>
+      <li><a href="/thermostat">Thermostate</a></li>
+      <li><a href="/fensterkontakt">Fensterkontakt</a></li>
+    </ul>
+  </nav>
+</header>

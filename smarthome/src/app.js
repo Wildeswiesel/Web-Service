@@ -23,12 +23,24 @@ app.set('view engine', 'ejs');
 // Routen
 app.use('/thermostats', thermostatRoutes);
 app.use('/fensterkontakte', fensterkontaktRoutes);
+app.use(async (req, res, next) => {
+  try {
+    const rooms = await deviceService.getAllRooms(); // Räume aus dem Service laden
+    res.locals.rooms = rooms; // Räume global verfügbar machen
+    next();
+  } catch (err) {
+    console.error('Fehler beim Laden der Räume:', err);
+    res.locals.rooms = []; // Falls Fehler, leere Liste setzen
+    next();
+  }
+});
+
+
 
 app.get('/', async (req, res) => {
   try {
     const devices = await deviceService.getAllDevices();
-    const rooms = await deviceService.getAllRooms();
-    res.render('index', { devices, rooms });
+    res.render('index', { devices });
   } catch (err) {
     console.error('Fehler beim Laden der Geräte:', err);
     res.status(500).send('Serverfehler');
