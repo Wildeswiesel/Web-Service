@@ -49,9 +49,9 @@ services:
     networks: 
       - smarthome-nw
     ports:
-      - "3001:3001"
+      - "6000:6000"
     environment:
-      PORT: 3001
+      PORT: 6000
       DEFAULT_TEMPERATURE: 22
       ROOM_ID: "Wohnzimmer"
   
@@ -64,9 +64,9 @@ services:
     networks: 
       - smarthome-nw
     ports:
-      - "6000:6000"
+      - "3021:3021"
     environment:
-      PORT: 6000
+      PORT: 3021
   
   
 volumes:
