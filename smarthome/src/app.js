@@ -27,7 +27,8 @@ app.use('/fensterkontakte', fensterkontaktRoutes);
 app.get('/', async (req, res) => {
   try {
     const devices = await deviceService.getAllDevices();
-    res.render('index', { devices });
+    const rooms = await deviceService.getAllRooms();
+    res.render('index', { devices, rooms });
   } catch (err) {
     console.error('Fehler beim Laden der Geräte:', err);
     res.status(500).send('Serverfehler');

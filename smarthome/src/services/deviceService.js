@@ -12,6 +12,12 @@ function getAllDevices() {
     .then((result) => result.rows);
 }
 
+function getAllRooms() {
+  return db
+  .query('SELECT * FROM rooms')
+  .then((result) => result.rows);
+}
+
 function getWohnzimmerDevices() {
   return db
     .query("SELECT * FROM devices WHERE roomId ILIKE 'wohnzimmer'")
@@ -141,8 +147,10 @@ async function updateReducedTemperature(roomId, reduced_temperature) {
 }
 
 
+
 module.exports = {
   getAllDevices,
+  getAllRooms,
   getWohnzimmerDevices,
   getThermostate,
   getFensterkontakte,

@@ -12,9 +12,27 @@
   
   <section>
     <h2>Vorhandene Räume</h2>
-    <!-- Räume werden hier angezeigt -->
+    <table>
+      <thead>
+        <tr>
+          <th>Raum ID</th>
+          <th>Raumtemperatur</th>
+          <th>Reduzierte Temperatur</th>
+          <th>Aktuelle Temperatur</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% rooms.forEach(room => { %>
+          <tr data-room-id="<%= room.roomid %>">
+            <td><%= room.roomid %></td>
+            <td><%= room.room_temperature %>°C</td>
+            <td><%= room.reduced_temperature %>°C</td>
+            <td><%= room.current_temperature %>°C</td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
   </section>
-
   <section>
     <h2>Vorhandene Geräte</h2>
     <table>
