@@ -5,7 +5,7 @@ const docker = new Docker({ socketPath: '/var/run/docker.sock' });
 // src/services/thermostatService.js
 
 async function createThermostatContainer(thermostatId, defaultTemperature = 22, roomId = '') {
-  const hostPort = 3000 + thermostatId;
+  const hostPort = 6000 + thermostatId;
   try {
     const container = await docker.createContainer({
       Image: 'thermostat-image',
