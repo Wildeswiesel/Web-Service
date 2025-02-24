@@ -109,6 +109,12 @@ function getThermostatByDeviceId(deviceId) {
     .then((result) => result.rows[0]);
 }
 
+function getThermostateByRoom(roomId) {
+  const sql = "SELECT * FROM devices WHERE roomId = $1 AND type='thermostat'";
+  return db.query(sql, [roomId])
+    .then((result) => result.rows);
+}
+
 /**
  * Löschen eines Geräts anhand seiner internen ID
  */
@@ -180,6 +186,7 @@ module.exports = {
   getDeviceByDeviceId,
   getFensterByDeviceId,
   getThermostatByDeviceId,
+  getThermostateByRoom,
   deleteDevice,
   getRoomValues,
   updateRoomTemperature,
