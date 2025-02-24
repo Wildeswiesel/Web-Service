@@ -97,6 +97,18 @@ function getDeviceByDeviceId(deviceId) {
     .then((result) => result.rows[0]);
 }
 
+function getFensterByDeviceId(deviceId) {
+  const sql = "SELECT * FROM devices WHERE deviceId = $1 AND type='fensterkontakt'";
+  return db.query(sql, [deviceId])
+    .then((result) => result.rows[0]);
+}
+
+function getThermostatByDeviceId(deviceId) {
+  const sql = "SELECT * FROM devices WHERE deviceId = $1 AND type='thermostat'";
+  return db.query(sql, [deviceId])
+    .then((result) => result.rows[0]);
+}
+
 /**
  * Löschen eines Geräts anhand seiner internen ID
  */
@@ -166,6 +178,8 @@ module.exports = {
   getFensterkontakte,
   addDevice,
   getDeviceByDeviceId,
+  getFensterByDeviceId,
+  getThermostatByDeviceId,
   deleteDevice,
   getRoomValues,
   updateRoomTemperature,

@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
 
 router.get('/:deviceId/status', async (req, res) => {
     const { deviceId } = req.params;
-    const device = await deviceService.getDeviceByDeviceId(deviceId);
+    const device = await deviceService.getFensterByDeviceId(deviceId);
     if (!device) {
         return res.status(404).json({ error: 'Fensterkontakt nicht gefunden.'});
     }
@@ -47,7 +47,7 @@ router.get('/:deviceId/status', async (req, res) => {
 router.post('/:deviceId/closed', async (req, res) => {
   const { deviceId } = req.params;
 
-  const device = await deviceService.getDeviceByDeviceId(deviceId);
+  const device = await deviceService.getFensterByDeviceId(deviceId);
   if (!device) {
     return res.status(404).json({ error: 'Fensterkontakt nicht gefunden' });
   }
@@ -79,7 +79,7 @@ router.post('/:deviceId/closed', async (req, res) => {
 router.post('/:deviceId/open', async (req, res) => {
   const { deviceId } = req.params;
 
-  const device = await deviceService.getDeviceByDeviceId(deviceId);
+  const device = await deviceService.getFensterByDeviceId(deviceId);
   console.log(device)
   if (!device) {
     return res.status(404).json({ error: 'Fensterkontakt nicht gefunden' });

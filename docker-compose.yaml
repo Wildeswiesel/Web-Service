@@ -67,6 +67,7 @@ services:
       - "3021:3021"
     environment:
       PORT: 3021
+      ROOM_ID: "Wohnzimmer"
   
   
 volumes:
