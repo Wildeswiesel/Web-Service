@@ -79,3 +79,32 @@ nav ul li a {
 .dropdown-menu li a:hover {
   background-color: #f0f0f0;
 }
+
+#devices {
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+#devices th, #devices td {
+  border: 1px solid #999;
+  padding: 6px 10px;
+  text-align: center
+}
+
+#rooms{
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+#rooms th, #rooms td {
+  border: 1px solid #999;
+  padding: 6px 10px;
+  text-align: center
+}
+#löschen{
+  border: none;
+  background-color: transparent;
+  color: red;
+  font-size: 25px;
+  cursor: pointer;
+}

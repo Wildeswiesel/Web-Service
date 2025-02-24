@@ -12,7 +12,7 @@
   
   <section>
     <h2>Vorhandene Räume</h2>
-    <table>
+    <table id="rooms">
       <thead>
         <tr>
           <th>Raum ID</th>
@@ -35,7 +35,7 @@
   </section>
   <section>
     <h2>Vorhandene Geräte</h2>
-    <table>
+    <table id="devices">
       <thead>
         <tr>
           <th>Device ID</th>
@@ -64,7 +64,7 @@
             </td>
             <td>
               <!-- Lösch-Button hinzufügen -->
-              <button onclick="deleteDevice('<%= device.id %>')">🗑️ Löschen</button>
+              <button id="löschen" onclick="deleteDevice('<%= device.id %>')">&#x1F5D1;</button>
             </td>
           </tr>
         <% }) %>
