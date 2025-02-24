@@ -64,9 +64,9 @@ services:
     networks: 
       - smarthome-nw
     ports:
-      - "3021:3021"
+      - "6000:6000"
     environment:
-      PORT: 3021
+      PORT: 6000
   
   
 volumes:
