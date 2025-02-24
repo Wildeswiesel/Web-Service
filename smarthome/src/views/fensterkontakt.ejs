@@ -61,6 +61,7 @@
 
     async function getStatus(deviceId) {
       try {
+        console.log(deviceId)
         const res = await fetch(`/fensterkontakte/${deviceId}/status`);
         const data = await res.json();
         document.getElementById(`status_${deviceId}`).textContent = JSON.stringify(data, null, 2);

@@ -5,7 +5,7 @@ const deviceService = require('../services/deviceService');
 
 const CLOSED_MODE = 'closed'
 const OPEN_MODE = 'open'
-
+let startPort = 3020
 router.get('/', async (req, res) => {
     try {
       const fensterkontakte = await deviceService.getFensterkontakte();
@@ -18,7 +18,8 @@ router.get('/', async (req, res) => {
 
 router.get('/:deviceId/status', async (req, res) => {
     const { deviceId } = req.params;
-    const device = await deviceService.getDeviceByDeviceId(deviceId);
+    const device = await deviceService.getFensterByDeviceId(deviceId);
+    console.log(device.type)
     if (!device) {
         return res.status(404).json({ error: 'Fensterkontakt nicht gefunden.'});
     }
@@ -27,8 +28,7 @@ router.get('/:deviceId/status', async (req, res) => {
     }
 
     const containerName = `web-service-fensterkontakt-${deviceId}`;
-    const port = 3008+deviceId; //muss man noch schauen wie das geändert werden soll
-
+    const port = startPort+Number(deviceId); //muss man noch schauen wie das geändert werden soll
     try {
       const response = await axios.get(`http://${containerName}:${port}/status`);
       res.json(response.data); 
@@ -45,7 +45,7 @@ router.get('/:deviceId/status', async (req, res) => {
 router.post('/:deviceId/closed', async (req, res) => {
   const { deviceId } = req.params;
 
-  const device = await deviceService.getDeviceByDeviceId(deviceId);
+  const device = await deviceService.getFensterByDeviceId(deviceId);
   if (!device) {
     return res.status(404).json({ error: 'Fensterkontakt nicht gefunden' });
   }
@@ -54,7 +54,7 @@ router.post('/:deviceId/closed', async (req, res) => {
   }
 
   const containerName = `web-service-fensterkontakt-${deviceId}`;
-  const port = 3008+deviceId; //ggf noch Port umändern
+  const port = startPort+Number(deviceId); //ggf noch Port umändern
 
   // "Geschlossener Modus" an Fensterkontakt schicken
   try {
@@ -77,7 +77,7 @@ router.post('/:deviceId/closed', async (req, res) => {
 router.post('/:deviceId/open', async (req, res) => {
   const { deviceId } = req.params;
 
-  const device = await deviceService.getDeviceByDeviceId(deviceId);
+  const device = await deviceService.getFensterByDeviceId(deviceId);
   if (!device) {
     return res.status(404).json({ error: 'Fensterkontakt nicht gefunden' });
   }
@@ -86,7 +86,7 @@ router.post('/:deviceId/open', async (req, res) => {
   }
 
   const containerName = `web-service-fensterkontakt-${deviceId}`;
-  const port = 3008+deviceId; //ggf noch Port umändern falls nicht passt
+  const port = startPort+Number(deviceId); //ggf noch Port umändern falls nicht passt
 
   try {
     const body = {
