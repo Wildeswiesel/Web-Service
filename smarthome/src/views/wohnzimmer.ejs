@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wohnzimmer</title>
-  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/css/style.css" />
   <style>
     .editable {
       cursor: pointer;
@@ -50,8 +50,8 @@
                   <!-- Anzeige: Stufe (heatingMode) wird per Polling aktualisiert -->
                   <span class="heating-mode">Stufe: –</span>
               <% } else if (device.type === 'fensterkontakt') { %>
-                <button onclick="moveWindow('<%= device.deviceid %>', 'up')">▲</button>
-                <button onclick="moveWindow('<%= device.deviceid %>', 'down')">▼</button>
+                <button onclick="setOpen('<%= device.deviceid %>', 'Open')">▲</button>
+                <button onclick="SetClosed('<%= device.deviceid %>', 'Closed')">▼</button>
               <% } else { %>
                 –
               <% } %>
@@ -230,5 +230,6 @@
       }
     }
   </script>
+  <script src="/js/fensterkontakt.js"></script>
 </body>
 </html>
