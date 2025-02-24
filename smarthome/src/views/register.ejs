@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Device</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/register.css">
+</head>
+<body>
+    <%- include('partials/header') %>
+<section>
+    <h2>Neues Gerät registrieren</h2>
+    <form action="/register" method="POST">
+        <div>
+        <label for="type">Gerätetyp:</label>
+        <select name="type" id="type">
+            <option value="fensterkontakt">Fensterkontakt</option>
+            <option value="thermostat">Thermostat</option>
+        </select>
+        </div>
+        <div>
+        <label for="roomId">Raum:</label>
+        <input type="text" name="roomId" id="roomId" placeholder="z.B. Wohnzimmer" />
+        </div>
+        <button type="submit">Registrieren</button>
+    </form>
+    </section>
+
+</body>
+</html>

@@ -21,7 +21,7 @@ nav ul {
   }
   nav ul li a:hover {
     cursor: pointer;
-    color: #00ff00;
+    color: #0c8a29;
   }
   /* Links im Menü */
   nav ul li a {
@@ -69,5 +69,5 @@ nav ul {
   
   /* Hover-Farbe für Dropdown */
   .dropdown-menu li a:hover {
-    color: #00ff00;
+    color: #0c8a29;
   }

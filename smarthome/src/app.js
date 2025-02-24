@@ -77,6 +77,15 @@ app.get('/wohnzimmer', async (req, res) => {
   }
 });
 
+app.get('/register', async (req, res) => {
+  try {
+    res.render('register');
+  } catch (err) {
+    console.error('Fehler beim Laden der Geräte:', err);
+    res.status(500).send('Serverfehler');
+  }
+});
+
 // GET Room Status (z.B. /room/Wohnzimmer/status)
 app.get('/room/:roomId/status', async (req, res) => {
   const { roomId } = req.params;
