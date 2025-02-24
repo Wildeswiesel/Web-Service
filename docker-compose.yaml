@@ -56,7 +56,7 @@ services:
       ROOM_ID: "Wohnzimmer"
   
   fensterkontakt:
-    container_name: web-service-fensterkontakt-2
+    container_name: web-service-fensterkontakt-1
     build:
       context: .
       dockerfile: fensterkontakt/Dockerfile

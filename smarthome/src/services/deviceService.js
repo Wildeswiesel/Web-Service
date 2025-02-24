@@ -43,11 +43,21 @@ function getFensterkontakte() {
 
 async function addDevice(type, roomId) {
   // 1. Hole die höchste vorhandene deviceId
-  const result = await db.query('SELECT MAX(deviceId::INTEGER) FROM devices');
-  const maxDeviceId = result.rows[0]?.max || 0;  // Falls keine Einträge existieren, setze auf 0
-  const deviceId = maxDeviceId + 1;  // Jetzt erfolgt die numerische Addition
-  console.log("Neue deviceId:", deviceId);
-  
+  if (type === "thermostat") {
+    const thermoResult = await db.query("SELECT MAX(deviceId) FROM devices WHERE type='thermostat'");
+    const thermoMaxDeviceId = thermoResult.rows[0]?.max || 0;  // Falls keine Einträge existieren, setze auf 0
+    const thermoDeviceId = thermoMaxDeviceId + 1;  // Jetzt erfolgt die numerische Addition
+    console.log("Neue Thermostat deviceId:", thermoDeviceId);
+    deviceId = thermoDeviceId;
+  } else if (type === "fensterkontakt") {
+    const fensterResult = await db.query("SELECT MAX(deviceId) FROM devices WHERE type='fensterkontakt'");
+    const FensterMaxDeviceId = fensterResult.rows[0]?.max || 0;  // Falls keine Einträge existieren, setze auf 0
+    const FensterDeviceId = FensterMaxDeviceId + 1;  // Jetzt erfolgt die numerische Addition
+    console.log("Neue Fensterkontakt deviceId:", FensterDeviceId);
+    deviceId = FensterDeviceId;
+  } else {
+    throw new Error(`Unbekannter Gerätetyp: ${type}`);
+  }
   // 2. Gerät in die DB einfügen
   const sql = `
     INSERT INTO devices (deviceId, type, roomId)

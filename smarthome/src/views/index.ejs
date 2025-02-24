@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>SmartHome - Übersicht</title>
-  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
   <%- include('partials/header') %>
@@ -56,8 +56,8 @@
                   <!-- Anzeige: heatingMode wird per Polling aktualisiert -->
                   <span class="heating-mode">Stufe: –</span><!--  -- verändert zu der Stufe des Thermostats (0,1,2,3,4,5) -->
               <% } else if (device.type === 'fensterkontakt') { %>
-                <button onclick="moveWindow('<%= device.deviceid %>', 'up')">▲</button>
-                <button onclick="moveWindow('<%= device.deviceid %>', 'down')">▼</button>
+                <button onclick="setOpen('<%= device.deviceid %>', 'open')">▲</button>
+                <button onclick="setClosed('<%= device.deviceid %>', 'closed')">▼</button>
               <% } else { %>
                 –
               <% } %>
