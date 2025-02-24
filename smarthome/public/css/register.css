@@ -1,6 +1,6 @@
 /* Grundlegendes Styling */
 body {
-    background-color: #000; /* Schwarzer Hintergrund */
+    background: linear-gradient(#050e05, #0f380f); /* Schwarzer Hintergrund */
     color: #0c8a29; /* Dunkelgrüner Text */
     font-family: Arial, sans-serif;
     text-align: center;
