@@ -19,7 +19,6 @@ router.get('/', async (req, res) => {
 router.get('/:deviceId/status', async (req, res) => {
     const { deviceId } = req.params;
     const device = await deviceService.getFensterByDeviceId(deviceId);
-    console.log(device.type)
     if (!device) {
         return res.status(404).json({ error: 'Fensterkontakt nicht gefunden.'});
     }
@@ -60,9 +59,9 @@ router.post('/:deviceId/closed', async (req, res) => {
   try {
     const body = {
       targetMode: CLOSED_MODE,
-      mode: 'normal'
+      mode: 'closed'
     };
-    const updateRes = await axios.post(`http://${containerName}:${port}/update`, body);
+    const updateRes = await axios.post(`http://${containerName}:${port}/toggle`, body);
     res.json(updateRes.data);
   } catch (err) {
     console.error('Fehler beim Schließen des Fensters:', err.message);
@@ -86,14 +85,14 @@ router.post('/:deviceId/open', async (req, res) => {
   }
 
   const containerName = `web-service-fensterkontakt-${deviceId}`;
-  const port = startPort+Number(deviceId); //ggf noch Port umändern falls nicht passt
+  const port = startPort+Number(deviceId); 
 
   try {
     const body = {
       targetMode: OPEN_MODE,
       mode: 'open'
     };
-    const updateRes = await axios.post(`http://${containerName}:${port}/update`, body);
+    const updateRes = await axios.post(`http://${containerName}:${port}/toggle`, body);
     res.json(updateRes.data);
   } catch (err) {
     console.error('Fehler beim Öffnen des Fensters:', err.message);
