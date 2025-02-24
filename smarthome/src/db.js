@@ -13,7 +13,7 @@ async function initDb() {
   const createDevicesTableSQL = `
     CREATE TABLE IF NOT EXISTS devices (
       id SERIAL PRIMARY KEY,
-      deviceId INT UNIQUE NOT NULL,
+      deviceId INT NOT NULL,
       type TEXT NOT NULL,
       roomId TEXT
     )
