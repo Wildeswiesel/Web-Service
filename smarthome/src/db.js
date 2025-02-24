@@ -40,7 +40,7 @@ async function initDb() {
 }
 
 // Fügt ein neues Gerät hinzu und legt (falls nötig) den Raum an
-async function addDevice(type, roomId) {
+async function addDevice(deviceId, type, roomId) {
   // Falls ein Raum angegeben wurde, prüfen und ggf. anlegen:
   if (roomId) {
     const checkRoomSql = 'SELECT * FROM rooms WHERE roomId = $1';
@@ -69,10 +69,10 @@ async function addDevice(type, roomId) {
     // Falls nicht vorhanden, füge das Gerät hinzu – deviceId wird automatisch generiert.
     const insertQuery = `
       INSERT INTO devices (deviceId, type, roomId) 
-      VALUES (DEFAULT, $1, $2) 
+      VALUES ($1, $2, $3) 
       RETURNING deviceId;
     `;
-    const result = await pool.query(insertQuery, [type, roomId]);
+    const result = await pool.query(insertQuery, [deviceId, type, roomId]);
     console.log('✅ Gerät erfolgreich hinzugefügt:', result.rows[0]);
     return result.rows[0].deviceid;
   } catch (err) {
@@ -134,8 +134,8 @@ async function start() {
     await initDb();
     console.log("✅ Datenbank-Initialisierung abgeschlossen.");
     // Initial-Geräte hinzufügen (falls noch nicht vorhanden)
-    await addDevice('thermostat', 'Wohnzimmer');
-    await addDevice('fensterkontakt', 'Wohnzimmer');
+    await addDevice(1,'thermostat', 'Wohnzimmer');
+    await addDevice(1,'fensterkontakt', 'Wohnzimmer');
     console.log("✅ Geräte wurden erfolgreich hinzugefügt.");
   } catch (err) {
     console.error("❌ Fehler während der Initialisierung:", err);
