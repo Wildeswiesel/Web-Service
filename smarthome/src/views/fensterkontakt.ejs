@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fensterkontakt</title>
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <%- include('partials/header') %>
@@ -39,38 +39,9 @@
       }
     }
 
-    async function setClosed(deviceId) {
-      try {
-        const res = await fetch(`/fensterkontakte/${deviceId}/closed`, { method: 'POST' });
-        const data = await res.json();
-        alert(`Fenster ist geschlossen:\n${JSON.stringify(data)}`);
-      } catch (err) {
-        alert('Fehler beim Schließen des Fensters');
-      }
-    }
-
-    async function setOpen(deviceId) {
-      try {
-        const res = await fetch(`/fensterkontakte/${deviceId}/open`, { method: 'POST' });
-        const data = await res.json();
-        alert(`Fenster ist geöffnet:\n${JSON.stringify(data)}`);
-      } catch (err) {
-        alert('Fehler beim Öffnen des Fensters');
-      }
-    }
-
-    async function getStatus(deviceId) {
-      try {
-        const res = await fetch(`/fensterkontakte/${deviceId}/status`);
-        const data = await res.json();
-        document.getElementById(`status_${deviceId}`).textContent = JSON.stringify(data, null, 2);
-      } catch (err) {
-        alert('Fehler beim Abfragen des Status');
-      }
-    }
-
     // Beim Laden des Dokuments
     loadWindowContacts();
   </script>
+  <script src="/js/fensterkontakt.js"></script>
 </body>
 </html>
