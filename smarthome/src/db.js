@@ -135,7 +135,7 @@ async function start() {
     console.log("✅ Datenbank-Initialisierung abgeschlossen.");
     // Initial-Geräte hinzufügen (falls noch nicht vorhanden)
     await addDevice(1,'thermostat', 'Wohnzimmer');
-    await addDevice(2,'fensterkontakt', 'Wohnzimmer');
+    await addDevice(1,'fensterkontakt', 'Wohnzimmer');
     console.log("✅ Geräte wurden erfolgreich hinzugefügt.");
   } catch (err) {
     console.error("❌ Fehler während der Initialisierung:", err);
