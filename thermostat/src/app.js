@@ -73,20 +73,18 @@ async function updateRoomCurrentTemperature() {
 }
 
 function updateHeatingMode() {
-  const target = (windowStatus === 'open') ? reducedTemperature : roomTemperature;
-  const coolingRate = (windowStatus === 'open') ? 0.30 : 0.015;
+  let target = (windowStatus === 'open') ? reducedTemperature : roomTemperature;
+  let coolingRate = (windowStatus === 'open') ? 0.13 : 0.015;
   currentTemperature -= coolingRate;
-  // Fehler und Ableitung berechnen:
-  const error = target - currentTemperature;
-  const errorRate = error - previousError;
+  // Fehler und wie schnell sich der Fehler ändert berechnen:
+  let error = target - currentTemperature;
+  let errorRate = error - previousError;
   previousError = error;
-  
-  // Kombiniere error und errorRate in einem Steuerwert:
-  const controlSignal = error + 0.5 * errorRate;
-  
+  let controlSignal = error + 0.5 * errorRate;
+
   if (controlSignal <= 0) {
     heatingMode = 0;
-  } else if (controlSignal <= 0.1) {
+  } else if (controlSignal <= 0.01) {
     heatingMode = 1;
   } else if (controlSignal <= 0.3) {
     heatingMode = 2;
@@ -97,13 +95,7 @@ function updateHeatingMode() {
   } else {
     heatingMode = 5;
   }
-  
-  // Dynamischer Faktor: Je höher currentTemperature im Vergleich zu roomTemperature, desto weniger effektiv ist das Heizen.
-  let reductionFactor = 1;
-  if (currentTemperature > roomTemperature) {
-    reductionFactor = Math.max(0.1, 1 - ((currentTemperature - roomTemperature) / 10));
-  }
-  
+ 
   // Basis-Heiz-Inkremente je heatingMode:
   let baseIncrement = 0;
   switch (heatingMode) {
@@ -115,7 +107,9 @@ function updateHeatingMode() {
     default: baseIncrement = 0;
   }
   
-  const heatingIncrement = baseIncrement * reductionFactor;
+  // Dynamischer Faktor: Je höher currentTemperature ist, desto weniger bringt das Heizen
+  let reductionFactor = 0.1 * currentTemperature;
+  let heatingIncrement = baseIncrement / reductionFactor;
   currentTemperature += heatingIncrement;
   
   // Sende das Update per SSE an alle verbundenen Clients:
