@@ -197,6 +197,21 @@ app.delete('/devices/:id', async (req, res) => {
   }
 });
 
+app.get('/:roomid', (req, res) => {
+  const roomid = req.params.roomid;
+
+  // Falls du eine Datenbank hast, hier den Raum abrufen
+  // const room = await db.query('SELECT * FROM rooms WHERE roomId = ?', [roomid]);
+
+  if (!roomid) {
+    return res.status(404).send('Raum nicht gefunden');
+  }
+
+  res.render('room', { roomid }); // Raum an die EJS-View übergeben
+});
+
+
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`SmartHome läuft auf http://localhost:${PORT}`);
