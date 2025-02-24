@@ -26,7 +26,7 @@ router.get('/:deviceId/status', async (req, res) => {
   }
   // WICHTIG: Verwende 3000 + deviceId, da das in thermostatService so definiert ist
   const containerName = `web-service-thermostat-${deviceId}`;
-  const port = 3000 + Number(deviceId);
+  const port = 6000 + Number(deviceId);
   try {
     const response = await axios.get(`http://${containerName}:${port}/status`);
     res.json(response.data);
@@ -48,7 +48,7 @@ router.post('/:deviceId/normal', async (req, res) => {
     return res.status(400).json({ error: 'Device is not a thermostat' });
   }
   const containerName = `web-service-thermostat-${deviceId}`;
-  const port = 300 + Number(deviceId);
+  const port = 6000 + Number(deviceId);
   try {
     const body = {
       // Es wird kein Temperaturwert übergeben – der Thermostat holt seinen ROOM_TEMP selbst
@@ -73,7 +73,7 @@ router.post('/:deviceId/reduced', async (req, res) => {
     return res.status(400).json({ error: 'Device is not a thermostat' });
   }
   const containerName = `web-service-thermostat-${deviceId}`;
-  const port = 300 + Number(deviceId);
+  const port = 6000 + Number(deviceId);
   try {
     const body = {
       mode: 'reduced'
