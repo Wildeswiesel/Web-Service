@@ -139,6 +139,8 @@ app.get('/status', (req, res) => {
 // Mit /update können manuell Werte gesetzt werden:
 app.post('/update', async (req, res) => {
   const { currentTemp, roomTemp, reducedTemp, window } = req.body;
+  console.log("Empfangene Daten:", req.body); // Debugging-Log
+
   if (currentTemp !== undefined) {
     currentTemperature = Number(currentTemp);
   }
@@ -149,8 +151,11 @@ app.post('/update', async (req, res) => {
     reducedTemperature = Number(reducedTemp);
   }
   if (window !== undefined) {
-    windowStatus = window;
+    windowStatus =windowStatus = String(window).toLowerCase();
   }
+
+  console.log(`Empfangener Fensterstatus: ${windowStatus}`);
+
   updateHeatingMode();
   await updateRoomCurrentTemperature();
   res.json({

@@ -158,7 +158,7 @@ app.post('/fensterstatus', async (req, res) => {
 
 try {
         await axios.post(`http://${thermoContainerName}:${thermoPort}/update`, {
-            windowStatus: status
+            window: status
         });
         console.log(`Thermostat ${deviceId} erfolgreich informiert.`);
     } catch (err) {
