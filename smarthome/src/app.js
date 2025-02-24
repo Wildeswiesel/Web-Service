@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
+const axios = require('axios');
 const deviceService = require('./services/deviceService');
 const thermostatService = require('./services/thermostatService');
 const thermostatRoutes = require('./routes/thermostatRoutes');
@@ -136,24 +137,33 @@ app.post('/register', async (req, res) => {
 
 app.post('/fensterstatus', async (req, res) => {
   const { deviceId, roomId, status } = req.body;
-  console.log(`Fensterstatus erhalten: Gerät ${deviceId} ist jetzt ${status}`);
+  console.log(`Fensterstatus erhalten: Fenster ${deviceId} ist jetzt ${status}`);
 
   try {
       // Finde alle Thermostate im gleichen Raum
       const thermostate = await deviceService.getThermostateByRoom(roomId);
+      console.log("Gefundene Thermostate:", thermostate);      
 
       if (thermostate.length === 0) {
           return res.status(404).json({ error: 'Kein Thermostat für diesen Raum gefunden' });
       }
+    
 
       // Informiere jedes Thermostat
       for (const thermostat of thermostate) {
-          const thermoContainerName = `web-service-thermostat-${thermostat.deviceId}`;
-          const thermoPort = 6000 + Number(thermostat.deviceId);
+          const deviceId = thermostat.deviceid;
 
-          await axios.post(`http://${thermoContainerName}:${thermoPort}/update`, {
-              windowStatus: status
-          });
+          const thermoContainerName = `web-service-thermostat-${deviceId}`;
+          const thermoPort = 6000 + Number(deviceId);
+
+try {
+        await axios.post(`http://${thermoContainerName}:${thermoPort}/update`, {
+            windowStatus: status
+        });
+        console.log(`Thermostat ${deviceId} erfolgreich informiert.`);
+    } catch (err) {
+        console.error(`Fehler beim Senden an Thermostat ${deviceId}:`, err.message);
+    }
       }
 
       res.json({ success: true, message: `Thermostate über Fensterstatus informiert: ${status}` });

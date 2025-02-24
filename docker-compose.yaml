@@ -54,6 +54,7 @@ services:
       PORT: 6001
       DEFAULT_TEMPERATURE: 22
       ROOM_ID: "Wohnzimmer"
+      THERMOSTAT_ID: 1
   
   fensterkontakt:
     container_name: web-service-fensterkontakt-1
@@ -68,6 +69,7 @@ services:
     environment:
       PORT: 3021
       ROOM_ID: "Wohnzimmer"
+      FENSTERKONTAKT_ID: 1
   
   
 volumes:

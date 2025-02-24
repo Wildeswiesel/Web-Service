@@ -74,7 +74,7 @@ app.post('/toggle', async (req, res) => {
     try {
         // Nachricht an das Smart Home senden
         await axios.post(SMART_HOME_URL, {
-            deviceId: process.env.DEVICE_ID,
+            deviceId: process.env.FENSTERKONTAKT_ID,
             roomId: process.env.ROOM_ID,
             status: mode // 'open' oder 'closed'
         });
