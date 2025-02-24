@@ -17,7 +17,7 @@ router.get('/', async (req, res) => {
 // GET /thermostats/:deviceId/status – Query the running thermostat container
 router.get('/:deviceId/status', async (req, res) => {
   const { deviceId } = req.params;
-  const device = await deviceService.getThermostatByDeviceId(deviceId);
+  const device = await deviceService.getDeviceByDeviceId(deviceId);
   if (!device) {
     return res.status(404).json({ error: 'Thermostat not found' });
   }
@@ -40,7 +40,7 @@ router.get('/:deviceId/status', async (req, res) => {
 // (hier wird kein Temperaturwert übergeben, da der Thermostat die Raumwerte selbst aus der DB abruft)
 router.post('/:deviceId/normal', async (req, res) => {
   const { deviceId } = req.params;
-  const device = await deviceService.getThermostatByDeviceId(deviceId);
+  const device = await deviceService.getDeviceByDeviceId(deviceId);
   if (!device) {
     return res.status(404).json({ error: 'Thermostat not found' });
   }
@@ -65,7 +65,7 @@ router.post('/:deviceId/normal', async (req, res) => {
 // POST /thermostats/:deviceId/reduced – Set thermostat to reduced mode
 router.post('/:deviceId/reduced', async (req, res) => {
   const { deviceId } = req.params;
-  const device = await deviceService.getThermostatByDeviceId(deviceId);
+  const device = await deviceService.getDeviceByDeviceId(deviceId);
   if (!device) {
     return res.status(404).json({ error: 'Thermostat not found' });
   }
