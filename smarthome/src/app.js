@@ -23,6 +23,7 @@ app.set('view engine', 'ejs');
 // Routen
 app.use('/thermostats', thermostatRoutes);
 app.use('/fensterkontakte', fensterkontaktRoutes);
+
 app.use(async (req, res, next) => {
   try {
     const rooms = await deviceService.getAllRooms(); // Räume aus dem Service laden
@@ -130,6 +131,35 @@ app.post('/register', async (req, res) => {
   } catch (err) {
     console.error('Fehler beim Hinzufügen eines Geräts:', err);
     res.status(500).send('Gerät konnte nicht angelegt werden');
+  }
+});
+
+app.post('/fensterstatus', async (req, res) => {
+  const { deviceId, roomId, status } = req.body;
+  console.log(`Fensterstatus erhalten: Gerät ${deviceId} ist jetzt ${status}`);
+
+  try {
+      // Finde alle Thermostate im gleichen Raum
+      const thermostate = await deviceService.getThermostateByRoom(roomId);
+
+      if (thermostate.length === 0) {
+          return res.status(404).json({ error: 'Kein Thermostat für diesen Raum gefunden' });
+      }
+
+      // Informiere jedes Thermostat
+      for (const thermostat of thermostate) {
+          const thermoContainerName = `web-service-thermostat-${thermostat.deviceId}`;
+          const thermoPort = 6000 + Number(thermostat.deviceId);
+
+          await axios.post(`http://${thermoContainerName}:${thermoPort}/update`, {
+              windowStatus: status
+          });
+      }
+
+      res.json({ success: true, message: `Thermostate über Fensterstatus informiert: ${status}` });
+  } catch (err) {
+      console.error('Fehler beim Senden an das Thermostat:', err.message);
+      res.status(500).json({ error: 'Thermostat nicht erreichbar' });
   }
 });
 

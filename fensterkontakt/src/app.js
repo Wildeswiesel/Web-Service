@@ -11,6 +11,8 @@ const windowContactId = process.env.FENSTERKONTAKT_ID || '1';
 
 let mode = 'closed'; // Fensterzustand: 'closed', 'open'
 
+const SMART_HOME_URL = "http://web-service-smarthome-1:3000/fensterstatus"; // URL vom Smart Home
+
 app.use(express.json());
 
 app.get('/status', (req, res) =>  {
@@ -60,10 +62,27 @@ app.post('/control', (req, res) => {
     res.send({ message: `Fenster ${action}`, id });
 });
 
+
+
 // Umschalten des Fensterzustands
-app.post('/toggle', (req, res) => {
+app.post('/toggle', async (req, res) => {
+    // Fensterstatus umschalten
     mode = mode === 'closed' ? 'open' : 'closed';
-    res.send({ message: `Fenster ist jetzt ${mode}` });
+    console.log(`Fensterstatus geändert: ${mode}`);
+
+    try {
+        // Nachricht an das Smart Home senden
+        await axios.post(SMART_HOME_URL, {
+            deviceId: process.env.DEVICE_ID,
+            roomId: process.env.ROOM_ID,
+            status: mode // 'open' oder 'closed'
+        });
+
+        res.json({ message: `Fenster ist jetzt ${mode}`, success: true });
+    } catch (err) {
+        console.error('Fehler beim Senden an das Smart Home:', err.message);
+        res.status(500).json({ error: 'Smart Home nicht erreichbar' });
+    }
 });
 
 // Liste aller registrierten Fensterkontakte

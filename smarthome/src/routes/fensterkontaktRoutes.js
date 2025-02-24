@@ -78,6 +78,7 @@ router.post('/:deviceId/open', async (req, res) => {
   const { deviceId } = req.params;
 
   const device = await deviceService.getDeviceByDeviceId(deviceId);
+  console.log(device)
   if (!device) {
     return res.status(404).json({ error: 'Fensterkontakt nicht gefunden' });
   }

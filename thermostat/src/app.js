@@ -165,7 +165,7 @@ app.post('/update', async (req, res) => {
   });
 });
 
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 6001;
 app.listen(port, () => {
   console.log(`Thermostat ${thermostatId} (room: ${roomId}) running on port ${port}`);
 });
