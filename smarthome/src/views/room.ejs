@@ -70,10 +70,11 @@
 </section>
 
 <script>
+  const roomId = "<%= roomid %>";
   // Raumwerte abrufen und alle 1000ms aktualisieren
-  async function fetchRoomValues() {
+  async function fetchRoomValues(roomid) {
       try {
-        const res = await fetch('/room/:roomid/status');
+        const res = await fetch(`/room/${roomId}/status`);
         if (res.ok) {
           const data = await res.json();
           document.querySelector('#roomTemperature .value').textContent = data.room_temperature;
@@ -86,8 +87,8 @@
         console.error('Fehler beim Abrufen der Raumwerte:', err);
       }
     }
-    fetchRoomValues();
-    setInterval(fetchRoomValues, 1000);
+    fetchRoomValues(roomId);
+    setInterval(() => fetchRoomValues(roomId), 1000);
 
     // Inline-Editing: Macht ein Feld editierbar
     function makeEditable(fieldId) {

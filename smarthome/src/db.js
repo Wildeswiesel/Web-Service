@@ -1,4 +1,6 @@
 const { Pool } = require('pg');
+const Docker = require('dockerode');
+const docker = new Docker({ socketPath: '/var/run/docker.sock' });
 
 const pool = new Pool({
   user: process.env.PGUSER || 'postgres',
@@ -8,36 +10,6 @@ const pool = new Pool({
   port: 5432,
 });
 
-// Tabelle devices für alle Geräte
-async function initDb() {
-  const createDevicesTableSQL = `
-    CREATE TABLE IF NOT EXISTS devices (
-      id SERIAL PRIMARY KEY,
-      deviceId INT NOT NULL,
-      type TEXT NOT NULL,
-      roomId TEXT
-    )
-  `;
-  // Tabelle rooms für raumbezogene Werte
-  const createRoomsTableSQL = `
-    CREATE TABLE IF NOT EXISTS rooms (
-      id SERIAL PRIMARY KEY,
-      roomId TEXT UNIQUE NOT NULL,
-      room_temperature NUMERIC DEFAULT 22,
-      reduced_temperature NUMERIC DEFAULT 18,
-      current_temperature NUMERIC DEFAULT 22
-    )
-  `;
-  
-  try {
-    await pool.query(createDevicesTableSQL);
-    console.log('Tabelle "devices" ist bereit (ggf. gerade erstellt).');
-    await pool.query(createRoomsTableSQL);
-    console.log('Tabelle "rooms" ist bereit (ggf. gerade erstellt).');
-  } catch (err) {
-    console.error('Fehler beim Erstellen der Tabellen:', err);
-  }
-}
 
 // Fügt ein neues Gerät hinzu und legt (falls nötig) den Raum an
 async function addDevice(deviceId, type, roomId) {
@@ -66,7 +38,6 @@ async function addDevice(deviceId, type, roomId) {
       // Gebe deviceId des bereits existierenden Geräts zurück
       return checkResult.rows[0].deviceid;
     }
-    // Falls nicht vorhanden, füge das Gerät hinzu – deviceId wird automatisch generiert.
     const insertQuery = `
       INSERT INTO devices (deviceId, type, roomId) 
       VALUES ($1, $2, $3) 
@@ -129,18 +100,125 @@ async function updateReducedTemperature(roomId, reduced_temperature) {
   await pool.query(sql, [Number(reduced_temperature), roomId]);
 }
 
-async function start() {
+// ab hier startet die tabellen generierung 
+// Tabelle devices für alle Geräte
+async function initDb() {
+  const createDevicesTableSQL = `
+    CREATE TABLE IF NOT EXISTS devices (
+      id SERIAL PRIMARY KEY,
+      deviceId INT NOT NULL,
+      type TEXT NOT NULL,
+      roomId TEXT
+    )
+  `;
+  // Tabelle rooms für raumbezogene Werte
+  const createRoomsTableSQL = `
+    CREATE TABLE IF NOT EXISTS rooms (
+      id SERIAL PRIMARY KEY,
+      roomId TEXT UNIQUE NOT NULL,
+      room_temperature NUMERIC DEFAULT 22,
+      reduced_temperature NUMERIC DEFAULT 18,
+      current_temperature NUMERIC DEFAULT 22
+    )
+  `;
+  
   try {
-    await initDb();
-    console.log("✅ Datenbank-Initialisierung abgeschlossen.");
-    // Initial-Geräte hinzufügen (falls noch nicht vorhanden)
-    await addDevice(1,'thermostat', 'Wohnzimmer');
-    await addDevice(1,'fensterkontakt', 'Wohnzimmer');
-    console.log("✅ Geräte wurden erfolgreich hinzugefügt.");
+    await pool.query(createDevicesTableSQL);
+    console.log('Tabelle "devices" ist bereit (ggf. gerade erstellt).');
+    await pool.query(createRoomsTableSQL);
+    console.log('Tabelle "rooms" ist bereit (ggf. gerade erstellt).');
   } catch (err) {
-    console.error("❌ Fehler während der Initialisierung:", err);
+    console.error('Fehler beim Erstellen der Tabellen:', err);
   }
 }
+// prüft ob die tabellen schon erstellt worden sind 
+async function waitForTable(tableName, retries = 10, delay = 2000) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      await pool.query(`SELECT 1 FROM ${tableName} LIMIT 1`);
+      console.log(`✅ Tabelle '${tableName}' ist bereit.`);
+      return;
+    } catch (err) {
+      console.log(`🔄 Warte auf '${tableName}'... (${i + 1}/${retries})`);
+      await new Promise(res => setTimeout(res, delay));
+    }
+  }
+  throw new Error(`❌ Tabelle '${tableName}' wurde nicht gefunden.`);
+}
+// schaut welche container schon da sind und uieht sich anhand dessen die diviceId ab und erstellt einen eintrag für das gerät
+async function getContainerDeviceMappings() {
+    try {
+        const containers = await docker.listContainers();
+        const deviceMappings = [];
+
+        for (const container of containers) {
+            const containerName = container.Names[0].replace("/", ""); // Entfernt "/"
+            let matchThermostat = containerName.match(/web-service-thermostat-(\d+)/);
+            let matchFensterkontakt = containerName.match(/web-service-fensterkontakt-(\d+)/);
+
+            if (matchThermostat || matchFensterkontakt) {
+                const roomId = await getRoomIdFromContainer(container.Id);
+
+                if (!roomId) {
+                    console.warn(`⚠️ ROOM_ID für Container ${containerName} nicht gefunden. Überspringe.`);
+                    continue;
+                }
+
+                if (matchThermostat) {
+                    const deviceId = parseInt(matchThermostat[1], 10);
+                    deviceMappings.push({ deviceId, type: 'thermostat', roomId });
+                }
+
+                if (matchFensterkontakt) {
+                    const deviceId = parseInt(matchFensterkontakt[1], 10);
+                    deviceMappings.push({ deviceId, type: 'fensterkontakt', roomId });
+                }
+            }
+        }
+
+        return deviceMappings;
+    } catch (error) {
+        console.error("❌ Fehler beim Abrufen der Container:", error);
+        return [];
+    }
+}
+// schaut in welchen raum der container ist um ihn in den richtigen raum zu speichern
+async function getRoomIdFromContainer(containerId) {
+    try {
+        const container = docker.getContainer(containerId);
+        const containerInfo = await container.inspect();
+        const envVars = containerInfo.Config.Env;
+
+        const roomIdVar = envVars.find(env => env.startsWith("ROOM_ID="));
+        return roomIdVar ? roomIdVar.split("=")[1] : null;
+    } catch (error) {
+        console.error(`❌ Fehler beim Abrufen der ROOM_ID für Container ${containerId}:`, error);
+        return null;
+    }
+}
+// wird beim starten ausgeführt
+async function start() {
+    try {
+        // erstellen der tabelle rooms & devices
+        await initDb();
+        console.log("✅ Datenbank-Initialisierung abgeschlossen.");
+        // warten auf die 2 tabellen
+        
+        await waitForTable("devices");
+        await waitForTable("rooms");
+        
+        // Container-IDs abrufen und Geräte hinzufügen
+        const deviceMappings = await getContainerDeviceMappings();
+        for (const { deviceId, type, roomId } of deviceMappings) {
+            await addDevice(deviceId, type, roomId);
+        }
+
+        console.log("✅ Geräte wurden erfolgreich basierend auf Containern hinzugefügt.");
+    } catch (err) {
+        console.error("❌ Fehler während der Initialisierung:", err);
+    }
+}
+
 
 start();
 
