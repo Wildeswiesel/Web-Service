@@ -13,27 +13,31 @@
   <section class="table-container-room">
     <h2>Vorhandene Räume</h2>
     <div class="table-scroll-room">
-    <table id="rooms">
-      <thead>
-        <tr>
-          <th>Raum ID</th>
-          <th>Raumtemperatur</th>
-          <th>Reduzierte Temperatur</th>
-          <th>Aktuelle Temperatur</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% rooms.forEach(room => { %>
-          <tr data-room-id="<%= room.roomid %>">
-            <td><%= room.roomid %></td>
-            <td><%= room.room_temperature %>°C</td>
-            <td><%= room.reduced_temperature %>°C</td>
-            <td><%= Number(room.current_temperature).toFixed(2) %>°C</td>
+      <table id="rooms">
+        <thead>
+          <tr>
+            <th>Raum ID</th>
+            <th>Raumtemperatur</th>
+            <th>Reduzierte Temperatur</th>
+            <th>Aktuelle Temperatur</th>
           </tr>
-        <% }) %>
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody>
+          <% rooms.forEach(room => { %>
+            <tr data-room-id="<%= room.roomid %>">
+              <td><%= room.roomid %></td>
+              <td><%= room.room_temperature %>°C</td>
+              <td><%= room.reduced_temperature %>°C</td>
+              <td>
+                <span id="currentTemperature_<%= room.roomid %>">
+                  <%= Number(room.current_temperature).toFixed(2) %>
+                </span>°C
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
   </section>
   <section class="table-container-device">
     <h2>Vorhandene Geräte</h2>
@@ -76,49 +80,77 @@
   </div>
   </section>
 
-
   <script>
-      async function deleteDevice(deviceId) {
-        if (!confirm("Willst du dieses Gerät wirklich löschen?")) return;
+    async function deleteDevice(deviceId) {
+      if (!confirm("Willst du dieses Gerät wirklich löschen?")) return;
+      try {
+        const response = await fetch(`/devices/${deviceId}`, { method: 'DELETE' });
+        if (response.ok) {
+          alert("Gerät erfolgreich gelöscht!");
+          location.reload(); // Seite neu laden, um das entfernte Gerät nicht mehr anzuzeigen
+        } else {
+          const errorText = await response.text();
+          alert("Fehler beim Löschen: " + errorText);
+        }
+      } catch (error) {
+        console.error("Fehler beim Löschen des Geräts:", error);
+        alert("Es gab ein Problem beim Löschen des Geräts.");
+      }
+    }
+
+    // Diese Funktion holt den Status jedes Thermostats und aktualisiert den angezeigten heatingMode
+    async function updateThermostatStatuses() {
+      const rows = document.querySelectorAll('tr.thermostat-row');
+      for (const row of rows) {
+        const deviceId = row.getAttribute('data-device-id');
         try {
-          const response = await fetch(`/devices/${deviceId}`, { method: 'DELETE' });
-          if (response.ok) {
-            alert("Gerät erfolgreich gelöscht!");
-            location.reload(); // Seite neu laden, um das entfernte Gerät nicht mehr anzuzeigen
-          } else {
-            const errorText = await response.text();
-            alert("Fehler beim Löschen: " + errorText);
-          }
-        } catch (error) {
-          console.error("Fehler beim Löschen des Geräts:", error);
-          alert("Es gab ein Problem beim Löschen des Geräts.");
-        }
-      }
-
-      // Diese Funktion holt den Status jedes Thermostats und aktualisiert den angezeigten heatingMode
-      async function updateThermostatStatuses() {
-        const rows = document.querySelectorAll('tr.thermostat-row');
-        for (const row of rows) {
-          const deviceId = row.getAttribute('data-device-id');
-          try {
-            const res = await fetch(`/thermostats/${deviceId}/status`);
-            if (res.ok) {
-              const data = await res.json();
-              if (row.querySelector('.heating-mode')) {
-                row.querySelector('.heating-mode').textContent = 'Stufe: ' + data.heatingMode;
-              }
+          const res = await fetch(`/thermostats/${deviceId}/status`);
+          if (res.ok) {
+            const data = await res.json();
+            if (row.querySelector('.heating-mode')) {
+              row.querySelector('.heating-mode').textContent = 'Stufe: ' + data.heatingMode;
             }
-          } catch (err) {
-            console.error(`Fehler beim Aktualisieren des Status für Gerät ${deviceId}:`, err);
+          }
+        } catch (err) {
+          console.error(`Fehler beim Aktualisieren des Status für Gerät ${deviceId}:`, err);
+        }
+      }
+    }
+
+    updateThermostatStatuses();
+    setInterval(updateThermostatStatuses, 3000);
+
+    async function fetchRoomStatus(roomId) {
+      try {
+        const res = await fetch(`/room/${roomId}/status`);
+        if (res.ok) {
+          return await res.json();
+        } else {
+          console.error(`Fehler beim Abrufen der Raumwerte für Raum ${roomId}`);
+        }
+      } catch (err) {
+        console.error(`Fehler beim Abrufen der Raumwerte für Raum ${roomId}:`, err);
+      }
+      return null;
+    }
+
+    async function updateRoomTemperatures() {
+      const rows = document.querySelectorAll('tr[data-room-id]');
+      for (const row of rows) {
+        const roomId = row.getAttribute('data-room-id');
+        const status = await fetchRoomStatus(roomId);
+        if (status) {
+          const tempElement = document.getElementById(`currentTemperature_${roomId}`);
+          if (tempElement) {
+            tempElement.textContent = Number(status.current_temperature).toFixed(2);
           }
         }
       }
-
-      // Jede Sekunde wird der Status aktualisiert
-      updateThermostatStatuses();
-      setInterval(updateThermostatStatuses, 3000);
+    }
+    
+    updateRoomTemperatures();
+    setInterval(updateRoomTemperatures, 3000);
   </script>
   <script src="/js/fensterkontakt.js"></script>
 </body>
 </html>
-
