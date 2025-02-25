@@ -1,7 +1,7 @@
 html, body {
     height: 100%;
-    background: linear-gradient(#050e05, #0f380f); /* Schwarzer Hintergrund */
-    color: #0c8a29; /* Dunkelgrüner Text */
+    background: linear-gradient(#050e05, #0f380f);
+    color: #0c8a29;
     font-family: Arial, sans-serif;
     text-align: center;
     margin: 0;
@@ -12,53 +12,89 @@ html, body {
 h2 {
     color: #0c8a29;
     text-shadow: 0 0 5px rgba(12, 138, 41, 0.3);
+    margin-bottom: 10px;
 }
 
-/* Form Styling */
-section {
+/* Container für jede Tabelle */
+.table-container {
     margin: 20px auto;
-    width: 50%;
+    width: 80%;
     background: #111;
-    padding: 20px;
+    padding: 20px; /* mehr Platz an den Seiten */
     border-radius: 8px;
     box-shadow: 0px 4px 10px rgba(12, 138, 41, 0.3);
-}
-
-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-form div {
-    margin-bottom: 15px;
-    width: 80%;
-}
-
-label {
-    font-size: 18px;
-    font-weight: bold;
-    display: block;
-    margin-bottom: 5px;
-    color: #15a03f;
-}
-
-/* Input-Felder */
-input, select {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    background-color: #222;
-    border: 2px solid #0c8a29;
-    color: #0c8a29;
-    border-radius: 5px;
-    outline: none;
     text-align: center;
-    transition: all 0.3s ease-in-out;
+    height: 33vh;
 }
 
-input:focus, select:focus {
-    border-color: #15a03f;
+/* Scrollbarer Bereich */
+.table-scroll {
+    max-height: 25vh; /* Höhe begrenzen, damit beide Tabellen auf die Seite passen */
+    overflow-y: auto; /* Scrollen nur vertikal */
+    margin: 0 auto;
+}
+
+/* Tabellen */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed; /* gleichmäßige Spaltenbreite */
+    margin: 0; /* kein extra Margin */
+}
+
+/* Tabellenkopf sticky machen */
+thead tr th {
+    position: sticky;
+    top: 0;           /* damit der Header am oberen Rand klebt */
+    background: #0c8a29;
+    color: white;
+    z-index: 2;       /* über den Body-Zeilen */
+}
+
+/* Zellen */
+th, td {
+    border: 1px solid #999;
+    padding: 10px;
+    text-align: center;
+}
+
+/* Icon-Löschbutton */
+#löschen {
+    border: none;
+    background-color: transparent;
+    color: red;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(150, 0, 0, 0.3);
+}
+#löschen {
+    border: none;
+    background-color: transparent;
+    color: red;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.3);
+}
+/* Alternierende Zeilenfarben */
+tbody tr:nth-child(even) {
+    background: #181818;
+}
+
+/* Hover-Effekt */
+tbody tr:hover {
+    background: rgba(12, 138, 41, 0.2);
+}
+
+/* Scrollbar-Styling für den table-scroll Container */
+.table-scroll::-webkit-scrollbar {
+    width: 10px;
+}
+
+.table-scroll::-webkit-scrollbar-thumb {
+    background-color: #0c8a29;
+    border-radius: 5px;
+}
+
+.table-scroll::-webkit-scrollbar-track {
+    background: #222;
 }
 
 /* Buttons */
@@ -67,7 +103,6 @@ button {
     color: #fff;
     border: none;
     padding: 10px 20px;
-    font-size: 18px;
     font-weight: bold;
     border-radius: 5px;
     cursor: pointer;
@@ -80,99 +115,10 @@ button:hover {
     box-shadow: 0 0 10px rgba(12, 138, 41, 0.5);
 }
 
-#devices {
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-
-#devices th, #devices td {
-    border: 1px solid #999;
-    padding: 6px 10px;
-    text-align: center
-}
-
-#rooms{
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-
-#rooms th, #rooms td {
-    border: 1px solid #999;
-    padding: 6px 10px;
-    text-align: center
-}
-#löschen{
-    border: none;
-    background-color: transparent;
-    color: red;
-    font-size: 25px;
-    cursor: pointer;
-}
-
-/* Tabelle zentrieren */
-table {
-    margin: 20px auto; /* Automatische Zentrierung */
-    border-collapse: collapse;
-    width: 80%; /* Breite der Tabelle */
-    background: #111; /* Dunkler Hintergrund */
-    color: #0c8a29; /* Grünlicher Text */
-    box-shadow: 0px 4px 10px rgba(12, 138, 41, 0.3);
-    overflow: hidden;
-}
-
-/* Tabellenkopf */
-th {
-    background: #0c8a29; /* Dunkelgrüner Hintergrund */
-    color: #fff; /* Weiße Schrift */
-    padding: 10px;
-    text-align: center;
-    font-weight: bold;
-}
-
-/* Tabellenzellen */
-td {
-    padding: 10px;
-    text-align: center;
-    border-bottom: 1px solid rgba(12, 138, 41, 0.3);
-}
-
-/* Letzte Zeile ohne Rand */
-tr:last-child td {
-    border-bottom: none;
-}
-
-/* Alternierende Zeilenfarbe */
-tr:nth-child(even) {
-    background: #181818;
-}
-
-/* Hover-Effekt */
-tr:hover {
-    background: rgba(12, 138, 41, 0.2);
-}
-
-/* Buttons in Tabellenzellen */
-td button {
-    background: #0c8a29;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-td button:hover {
-    background: #15a03f;
-}
-
-
 /* Responsives Design */
 @media (max-width: 768px) {
-    section {
-        width: 80%;
+    .table-container {
+        width: 90%;
+        padding: 10px;
     }
-
-    input, select {
-        width: 100%;
-    }}
+}

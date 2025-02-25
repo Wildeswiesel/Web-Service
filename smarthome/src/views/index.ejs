@@ -10,8 +10,9 @@
   
   <h1>SmartHome-Dashboard</h1>
   
-  <section>
+  <section class="table-container">
     <h2>Vorhandene Räume</h2>
+    <div class="table-scroll">
     <table id="rooms">
       <thead>
         <tr>
@@ -32,9 +33,11 @@
         <% }) %>
       </tbody>
     </table>
+  </div>
   </section>
-  <section>
+  <section class="table-container">
     <h2>Vorhandene Geräte</h2>
+    <div class="table-scroll">
     <table id="devices">
       <thead>
         <tr>
@@ -70,6 +73,7 @@
         <% }) %>
       </tbody>
     </table>
+  </div>
   </section>
 
 
