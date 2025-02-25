@@ -43,6 +43,7 @@ nav ul {
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     min-width: 150px;
+    z-index: 1000000000;
   }
   
   /* Dropdown-Elemente */
