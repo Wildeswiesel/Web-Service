@@ -51,7 +51,7 @@
                   <span class="heating-mode">Stufe: –</span>
               <% } else if (device.type === 'fensterkontakt') { %>
                 <button onclick="setOpen('<%= device.deviceid %>', 'open')">▲</button>
-                <button onclick="SetClosed('<%= device.deviceid %>', 'closed')">▼</button>
+                <button onclick="setClosed('<%= device.deviceid %>', 'closed')">▼</button>
               <% } else { %>
                 –
               <% } %>
