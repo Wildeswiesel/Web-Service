@@ -80,7 +80,9 @@ function updateHeatingMode() {
   let error = target - currentTemperature;
   let errorRate = error - previousError;
   previousError = error;
-  let controlSignal = error + 0.5 * errorRate;
+  let controlSignal;
+  if(windowStatus === 'open') {controlSignal = error + 2.0 * previousError; 
+  } else {controlSignal = error + 0.5 * errorRate;}
 
   if (controlSignal <= 0) {
     heatingMode = 0;
@@ -172,5 +174,5 @@ app.post('/update', async (req, res) => {
 
 const port = process.env.PORT || 6001;
 app.listen(port, () => {
-  console.log(`Thermostat ${thermostatId} (room: ${roomId}) running on port ${port}`);
+  console.log(`Thermostat (Raum: ${roomId}) läuft auf Port ${port}`);
 });
