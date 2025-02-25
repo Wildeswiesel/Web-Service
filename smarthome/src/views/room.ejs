@@ -6,44 +6,214 @@
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <%- include('partials/header') %>
+  <header>
+    <%- include('partials/header') %>
+  </header>
   <h1>Raum: <%= roomid %></h1>
   <p>Willkommen im Raum <strong><%= roomid %></strong>!</p>
-
-
-
-  <section>
-    <h2>Vorhandene Geräte</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Device ID</th>
-          <th>Typ</th>
-          <th>Raum</th>
-          <th>Aktion</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% devices.forEach(device => { %>
-          <tr data-device-id="<%= device.deviceid %>" class="<%= device.type === 'thermostat' ? 'thermostat-row' : '' %>">
-            <td><%= device.deviceid %></td>
-            <td><%= device.type %></td>
-            <td><%= device.roomid || '—' %></td>
-            <td>
-              <% if (device.type === 'thermostat') { %>
-                  <!-- Anzeige: Stufe (heatingMode) wird per Polling aktualisiert -->
-                  <span class="heating-mode">Stufe: –</span>
-              <% } else if (device.type === 'fensterkontakt') { %>
-                <button onclick="setOpen('<%= device.deviceid %>', 'open')">▲</button>
-                <button onclick="setClosed('<%= device.deviceid %>', 'closed')">▼</button>
-              <% } else { %>
-                –
-              <% } %>
-            </td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
-  </section>
 </body>
+<section>
+  <h2>Vorhandene Geräte</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Device ID</th>
+        <th>Typ</th>
+        <th>Raum</th>
+        <th>Aktion</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% devices.forEach(device => { %>
+        <tr data-device-id="<%= device.deviceid %>" class="<%= device.type === 'thermostat' ? 'thermostat-row' : '' %>">
+          <td><%= device.deviceid %></td>
+          <td><%= device.type %></td>
+          <td><%= device.roomid || '—' %></td>
+          <td>
+            <% if (device.type === 'thermostat') { %>
+                <!-- Anzeige: Stufe (heatingMode) wird per Polling aktualisiert -->
+                <span class="heating-mode">Stufe: –</span>
+            <% } else if (device.type === 'fensterkontakt') { %>
+              <button onclick="setOpen('<%= device.deviceid %>', 'open')">▲</button>
+              <button onclick="setClosed('<%= device.deviceid %>', 'closed')">▼</button>
+            <% } else { %>
+              –
+            <% } %>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Raumwerte</h2>
+  <div id="room-values">
+    <p>Raumtemperatur: 
+      <span id="roomTemperature" class="editable">
+        <span class="value">–</span> °C
+        <span class="edit-icon" onclick="makeEditable('roomTemperature')">✎</span>
+      </span>
+    </p>
+    <p>Absenktemperatur: 
+      <span id="reducedTemperature" class="editable">
+        <span class="value">–</span> °C
+        <span class="edit-icon" onclick="makeEditable('reducedTemperature')">✎</span>
+      </span>
+    </p>
+    <p>Aktuelle Temperatur: 
+      <span id="currentTemperature">–</span> °C
+    </p>
+  </div>
+</section>
+
+<script>
+  // Raumwerte abrufen und alle 1000ms aktualisieren
+  async function fetchRoomValues() {
+      try {
+        const res = await fetch('/room/:roomid/status');
+        if (res.ok) {
+          const data = await res.json();
+          document.querySelector('#roomTemperature .value').textContent = data.room_temperature;
+          document.querySelector('#reducedTemperature .value').textContent = data.reduced_temperature;
+          document.getElementById('currentTemperature').textContent = data.current_temperature;
+        } else {
+          console.error('Fehler beim Abrufen der Raumwerte');
+        }
+      } catch (err) {
+        console.error('Fehler beim Abrufen der Raumwerte:', err);
+      }
+    }
+    fetchRoomValues();
+    setInterval(fetchRoomValues, 1000);
+
+    // Inline-Editing: Macht ein Feld editierbar
+    function makeEditable(fieldId) {
+      const container = document.getElementById(fieldId);
+      const valueSpan = container.querySelector('.value');
+      const currentValue = valueSpan.textContent.trim();
+      const input = document.createElement('input');
+      input.type = 'number';
+      input.step = '0.1';
+      input.value = currentValue !== '–' ? currentValue : '';
+      
+      // Erstelle einen Container für Input und Steuerbuttons
+      const editContainer = document.createElement('span');
+      editContainer.className = 'edit-container';
+      editContainer.appendChild(input);
+
+      // Bestätigungsbutton (Haken)
+      const confirmBtn = document.createElement('button');
+      confirmBtn.textContent = '✔';
+      confirmBtn.onclick = async function() {
+        const newValue = input.value;
+        await updateRoomValue(fieldId, newValue);
+        revertEditable(fieldId, newValue);
+      };
+      editContainer.appendChild(confirmBtn);
+
+      // Abbrechen-Button (Kreuz)
+      const cancelBtn = document.createElement('button');
+      cancelBtn.textContent = '✖';
+      cancelBtn.onclick = function() {
+        revertEditable(fieldId, currentValue);
+      };
+      editContainer.appendChild(cancelBtn);
+
+      // Ersetze den Inhalt des Containers
+      container.innerHTML = '';
+      container.appendChild(editContainer);
+      input.focus();
+    }
+
+    // Stellt das Feld nach der Bearbeitung wieder her (Wert + Edit-Icon)
+    function revertEditable(fieldId, value) {
+      const container = document.getElementById(fieldId);
+      container.innerHTML = `
+        <span class="value">${value !== '' ? value : '–'}</span> °C
+        <span class="edit-icon" onclick="makeEditable('${fieldId}')">✎</span>
+      `;
+    }
+
+    // Sendet den neuen Wert an den Server (nur das jeweilige Feld wird aktualisiert)
+    async function updateRoomValue(field, newValue) {
+  let endpoint = '';
+  if (field === 'roomTemperature') {
+    endpoint = '/room/room/updateRoomTemperature';
+  } else if (field === 'reducedTemperature') {
+    endpoint = '/room/room/updateReducedTemperature';
+  }
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ [field === 'roomTemperature' ? 'room_temperature' : 'reduced_temperature']: newValue })
+    });
+    if (!res.ok) {
+      const errorText = await res.text();
+      alert('Fehler: ' + errorText);
+    } else {
+      fetchRoomValues();
+    }
+  } catch (err) {
+    console.error('Fehler beim Aktualisieren der Raumwerte:', err);
+  }
+}
+
+    // Funktion zum Abrufen des Status eines Thermostats
+    async function fetchThermostatStatus(deviceId) {
+      try {
+        const res = await fetch(`/thermostats/${deviceId}/status`);
+        if (res.ok) {
+          return await res.json();
+        } else {
+          console.error(`Fehler beim Abrufen des Status für Gerät ${deviceId}`);
+        }
+      } catch (err) {
+        console.error(`Fehler beim Abrufen des Status für Gerät ${deviceId}:`, err);
+      }
+      return null;
+    }
+
+    // Aktualisiert alle Thermostat-Zeilen im Dashboard
+    async function updateThermostatStatuses() {
+      const rows = document.querySelectorAll('tr.thermostat-row');
+      for (const row of rows) {
+        const deviceId = row.getAttribute('data-device-id');
+        try {
+          const res = await fetch(`/thermostats/${deviceId}/status`);
+          if (res.ok) {
+            const data = await res.json();
+            if (row.querySelector('.heating-mode')) {
+              row.querySelector('.heating-mode').textContent = 'Stufe: ' + data.heatingMode;
+            }
+          }
+        } catch (err) {
+          console.error(`Fehler beim Aktualisieren des Status für Gerät ${deviceId}:`, err);
+        }
+      }
+    }
+    updateThermostatStatuses();
+    setInterval(updateThermostatStatuses, 5000);
+
+    //Soll nun die Funktion zum öffnen bzw schließen des Fensters beim Knopfdruck ausführen
+    function moveWindow(deviceId, direction) {
+      console.log(`Gerät ${deviceId} bewegt sich ${direction}`);
+      try {
+        if (direction == 'up') {
+          const {setOpen} = require('./fensterkontakt.ejs');
+          setOpen(deviceId)
+        }
+        else if (direction == 'down') {
+          const {setClosed} = require('./fensterkontakt.ejs')
+          setClosed(deviceId)
+        }
+      }
+      catch (err) {
+        console.error(`Fehler beim Aktualisieren des Gerätes: ${deviceId}`, err)
+      }
+    }
+  </script>
+  <script src="/js/fensterkontakt.js"></script>
+
 </html>
