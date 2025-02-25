@@ -7,6 +7,4 @@ RUN npm install
 
 COPY thermostat/. .
 
-EXPOSE 3001
-
 CMD ["npm", "start"]

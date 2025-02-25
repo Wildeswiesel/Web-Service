@@ -8,6 +8,4 @@ RUN npm install
 
 COPY fensterkontakt/. .
 
-EXPOSE 3021
-
 CMD ["npm", "start"]

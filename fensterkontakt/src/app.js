@@ -2,7 +2,9 @@ const express = require('express');
 const { exec } = require('child_process');
 const axios = require('axios');
 const app = express();
-const port = 3021;
+
+
+const port = process.env.PORT || 3021;
 
 const roomId = process.env.ROOM_ID || 'none';
 

@@ -14,7 +14,8 @@ async function createFensterkontaktContainer(deviceId, defaultMode = 'closed', r
       Env: [
         `FENSTERKONTAKT_ID=${deviceId}`,
         `DEFAULT_MODE=${defaultMode}`,
-        `ROOM_ID=${roomId}`
+        `ROOM_ID=${roomId}`,
+        `PORT=${hostPort}`
       ],
       ExposedPorts: {
         [`${hostPort}/tcp`]: {}
