@@ -10,6 +10,7 @@
 
 + Mit Docker starten: </br>
     + Docker-Image neu bauen: ``` docker-compose up --build ```
+    + Seite abrufen unter ``` http://localhost:3000 ```
 
    
  
