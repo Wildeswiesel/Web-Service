@@ -36,6 +36,13 @@ function getFensterkontakte() {
     .then((result) => result.rows);
 }
 
+function getDevicesByRoomId(roomId) {
+  return db
+    .query("SELECT * FROM devices WHERE roomId = $1", [roomId])
+    .then((result) => result.rows);
+}
+
+
 /**
  * Fügt ein neues Gerät hinzu und gibt die generierte ID zurück
  */
@@ -182,6 +189,7 @@ module.exports = {
   getWohnzimmerDevices,
   getThermostate,
   getFensterkontakte,
+  getDevicesByRoomId,
   addDevice,
   getDeviceByDeviceId,
   getFensterByDeviceId,

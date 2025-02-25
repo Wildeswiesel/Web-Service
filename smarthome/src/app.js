@@ -67,16 +67,6 @@ app.get('/fensterkontakt', async (req, res) => {
   }
 });
 
-app.get('/wohnzimmer', async (req, res) => {
-  try {
-    const devices = await deviceService.getWohnzimmerDevices();
-    res.render('wohnzimmer', { devices });
-  } catch (err) {
-    console.error('Fehler beim Laden der Geräte:', err);
-    res.status(500).send('Serverfehler');
-  }
-});
-
 app.get('/register', async (req, res) => {
   try {
     res.render('register');
@@ -85,6 +75,22 @@ app.get('/register', async (req, res) => {
     res.status(500).send('Serverfehler');
   }
 });
+
+app.get('/:roomid', async (req, res) => {
+  const roomid = req.params.roomid;
+  if (!roomid) {
+    return res.status(404).send('Raum nicht gefunden');
+  }
+
+  try {
+    const devices = await deviceService.getDevicesByRoomId(roomid);
+    res.render('room', { roomid, devices });
+  } catch (err) {
+    console.error('Fehler beim Laden der Geräte:', err);
+    res.status(500).send('Serverfehler');
+  }
+});
+
 
 // GET Room Status (z.B. /room/Wohnzimmer/status)
 app.get('/room/:roomId/status', async (req, res) => {
@@ -197,18 +203,6 @@ app.delete('/devices/:id', async (req, res) => {
   }
 });
 
-app.get('/:roomid', (req, res) => {
-  const roomid = req.params.roomid;
-
-  // Falls du eine Datenbank hast, hier den Raum abrufen
-  // const room = await db.query('SELECT * FROM rooms WHERE roomId = ?', [roomid]);
-
-  if (!roomid) {
-    return res.status(404).send('Raum nicht gefunden');
-  }
-
-  res.render('room', { roomid }); // Raum an die EJS-View übergeben
-});
 
 
 

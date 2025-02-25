@@ -9,5 +9,41 @@
   <%- include('partials/header') %>
   <h1>Raum: <%= roomid %></h1>
   <p>Willkommen im Raum <strong><%= roomid %></strong>!</p>
+
+
+
+  <section>
+    <h2>Vorhandene Geräte</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Device ID</th>
+          <th>Typ</th>
+          <th>Raum</th>
+          <th>Aktion</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% devices.forEach(device => { %>
+          <tr data-device-id="<%= device.deviceid %>" class="<%= device.type === 'thermostat' ? 'thermostat-row' : '' %>">
+            <td><%= device.deviceid %></td>
+            <td><%= device.type %></td>
+            <td><%= device.roomid || '—' %></td>
+            <td>
+              <% if (device.type === 'thermostat') { %>
+                  <!-- Anzeige: Stufe (heatingMode) wird per Polling aktualisiert -->
+                  <span class="heating-mode">Stufe: –</span>
+              <% } else if (device.type === 'fensterkontakt') { %>
+                <button onclick="setOpen('<%= device.deviceid %>', 'open')">▲</button>
+                <button onclick="setClosed('<%= device.deviceid %>', 'closed')">▼</button>
+              <% } else { %>
+                –
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </section>
 </body>
 </html>
