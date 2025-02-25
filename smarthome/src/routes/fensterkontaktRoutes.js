@@ -77,9 +77,7 @@ router.post('/:deviceId/closed', async (req, res) => {
  * Öffnet das Fenster.
  */
 router.post('/:deviceId/open', async (req, res) => {
-  console.log(req.params)
   const { deviceId } = req.params;
-  console.log(deviceId)
 
   const device = await deviceService.getFensterByDeviceId(deviceId);
   if (!device) {
@@ -90,9 +88,7 @@ router.post('/:deviceId/open', async (req, res) => {
   }
 
   const containerName = `web-service-fensterkontakt-${deviceId}`;
-  console.log(containerName)
   const port = startPort+Number(deviceId); //ggf noch Port umändern falls nicht passt
-  console.log(port)
   try {
     const body = {
       targetMode: OPEN_MODE,
