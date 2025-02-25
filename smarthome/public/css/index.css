@@ -72,10 +72,9 @@ th, td {
 #löschen {
     border: none;
     background-color: transparent;
-    color: red;
+    color: rgb(255, 0, 0, 0.5);
     cursor: pointer;
     font-size: 20px;
-    filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.3));
 }
 #löschen:hover {
     border: none;
