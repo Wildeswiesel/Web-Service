@@ -10,9 +10,9 @@
   
   <h1>SmartHome-Dashboard</h1>
   
-  <section class="table-container">
+  <section class="table-container-room">
     <h2>Vorhandene Räume</h2>
-    <div class="table-scroll">
+    <div class="table-scroll-room">
     <table id="rooms">
       <thead>
         <tr>
@@ -35,9 +35,9 @@
     </table>
   </div>
   </section>
-  <section class="table-container">
+  <section class="table-container-device">
     <h2>Vorhandene Geräte</h2>
-    <div class="table-scroll">
+    <div class="table-scroll-device">
     <table id="devices">
       <thead>
         <tr>
@@ -59,8 +59,8 @@
                   <!-- Anzeige: heatingMode wird per Polling aktualisiert -->
                   <span class="heating-mode">Stufe: –</span><!--  -- verändert zu der Stufe des Thermostats (0,1,2,3,4,5) -->
               <% } else if (device.type === 'fensterkontakt') { %>
-                <button onclick="setOpen('<%= device.deviceid %>', 'open')">▲</button>
-                <button onclick="setClosed('<%= device.deviceid %>', 'closed')">▼</button>
+                <button id="open" onclick="setOpen('<%= device.deviceid %>', 'open')">▲</button>
+                <button id="close" onclick="setClosed('<%= device.deviceid %>', 'closed')">▼</button>
               <% } else { %>
                 –
               <% } %>

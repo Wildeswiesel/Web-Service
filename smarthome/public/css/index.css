@@ -16,7 +16,7 @@ h2 {
 }
 
 /* Container für jede Tabelle */
-.table-container {
+.table-container-room, .table-container-device {
     margin: 20px auto;
     width: 80%;
     background: #111;
@@ -24,16 +24,26 @@ h2 {
     border-radius: 8px;
     box-shadow: 0px 4px 10px rgba(12, 138, 41, 0.3);
     text-align: center;
-    height: 33vh;
+}
+.table-container-device{
+    max-height: 37vh;
+}
+
+.table-container-room{
+    max-height: 30vh;
 }
 
 /* Scrollbarer Bereich */
-.table-scroll {
-    max-height: 25vh; /* Höhe begrenzen, damit beide Tabellen auf die Seite passen */
+.table-scroll-room, .table-scroll-device {
     overflow-y: auto; /* Scrollen nur vertikal */
     margin: 0 auto;
 }
-
+.table-scroll-device{
+    max-height: 27vh;
+}
+.table-scroll-room{
+    max-height: 20vh;
+}
 /* Tabellen */
 table {
     width: 100%;
@@ -64,14 +74,16 @@ th, td {
     background-color: transparent;
     color: red;
     cursor: pointer;
-    box-shadow: 0 0 5px rgba(150, 0, 0, 0.3);
+    font-size: 20px;
+    filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.3));
 }
-#löschen {
+#löschen:hover {
     border: none;
     background-color: transparent;
     color: red;
     cursor: pointer;
-    box-shadow: 0 0 5px rgba(255, 0, 0, 0.3);
+    font-size: 20px;
+    filter: drop-shadow(0 0 10px rgb(255, 0, 0));
 }
 /* Alternierende Zeilenfarben */
 tbody tr:nth-child(even) {
@@ -84,25 +96,25 @@ tbody tr:hover {
 }
 
 /* Scrollbar-Styling für den table-scroll Container */
-.table-scroll::-webkit-scrollbar {
+.table-scroll-device::-webkit-scrollbar, .table-scroll-room::-webkit-scrollbar {
     width: 10px;
 }
 
-.table-scroll::-webkit-scrollbar-thumb {
+.table-scroll-device::-webkit-scrollbar-thumb, .table-scroll-room::-webkit-scrollbar-thumb {
     background-color: #0c8a29;
     border-radius: 5px;
 }
 
-.table-scroll::-webkit-scrollbar-track {
+.table-scroll-device::-webkit-scrollbar-track, .table-scroll-room::-webkit-scrollbar-track {
     background: #222;
 }
 
 /* Buttons */
-button {
+#open, #close {
     background: #0c8a29;
     color: #fff;
     border: none;
-    padding: 10px 20px;
+    padding: 5px 10px;
     font-weight: bold;
     border-radius: 5px;
     cursor: pointer;
@@ -110,7 +122,7 @@ button {
     box-shadow: 0 0 5px rgba(12, 138, 41, 0.3);
 }
 
-button:hover {
+#open:hover, #close:hover {
     background: #15a03f;
     box-shadow: 0 0 10px rgba(12, 138, 41, 0.5);
 }
