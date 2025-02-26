@@ -77,7 +77,7 @@
           const data = await res.json();
           document.querySelector('#roomTemperature .value').textContent = data.room_temperature;
           document.querySelector('#reducedTemperature .value').textContent = data.reduced_temperature;
-          document.getElementById('currentTemperature').textContent = data.current_temperature;
+          document.getElementById('currentTemperature').textContent = Number(data.current_temperature).toFixed(2);
         } else {
           console.error('Fehler beim Abrufen der Raumwerte');
         }
