@@ -140,9 +140,9 @@
     async function updateRoomValue(field, newValue) {
   let endpoint = '';
   if (field === 'roomTemperature') {
-    endpoint = '/room/room/updateRoomTemperature';
+    endpoint = `/room/${roomId}/updateRoomTemperature`;
   } else if (field === 'reducedTemperature') {
-    endpoint = '/room/room/updateReducedTemperature';
+    endpoint = `/room/${roomId}/updateReducedTemperature`;
   }
   try {
     const res = await fetch(endpoint, {
