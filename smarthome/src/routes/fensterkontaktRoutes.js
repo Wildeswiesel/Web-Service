@@ -40,10 +40,9 @@ router.get('/:deviceId/status', async (req, res) => {
     }
 })
 
-/**
- * POST /fensterkontakt/:deviceId/closed
- * Schließt das Fenster.
- */
+
+ //POST /fensterkontakt/:deviceId/closed
+ //Schließt das Fenster.
 router.post('/:deviceId/closed', async (req, res) => {
   const { deviceId } = req.params;
 
@@ -72,10 +71,9 @@ router.post('/:deviceId/closed', async (req, res) => {
   }
 });
 
-/**
- * POST /fensterkontakt/:deviceId/open
- * Öffnet das Fenster.
- */
+
+ //POST /fensterkontakt/:deviceId/open
+ //Öffnet das Fenster.
 router.post('/:deviceId/open', async (req, res) => {
   const { deviceId } = req.params;
 
