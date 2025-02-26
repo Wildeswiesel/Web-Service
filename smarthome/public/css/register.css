@@ -58,7 +58,8 @@ input:focus, select:focus {
     border-color: #15a03f;
 }
 #register{
-    margin-top: 15px;
+    display: block;
+    margin: 10px auto; /* Abstand nach oben */
 }
 /* Buttons */
 button {
