@@ -150,6 +150,25 @@ app.post('/register', async (req, res) => {
   }
 });
 
+
+app.post('/registerRoom', async (req, res) => {
+    try {
+        const { roomId } = req.body;
+
+        if (!roomId || roomId.trim() === '') {
+            return res.status(400).json({ error: 'Raum-ID darf nicht leer sein' });
+        }
+
+        await deviceService.addRoom(roomId.trim());
+
+        res.redirect('/');
+      } catch (error) {
+        console.error('Fehler beim Hinzufügen des Raums:', error);
+        res.status(500).json({ error: 'Interner Serverfehler' });
+    }
+});
+
+
 app.post('/fensterstatus', async (req, res) => {
   const { deviceId, roomId, status } = req.body;
   console.log(`Fensterstatus erhalten: Fenster ${deviceId} ist jetzt ${status}`);

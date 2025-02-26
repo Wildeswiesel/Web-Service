@@ -22,12 +22,25 @@
         </select>
         </div>
         <div>
-        <label for="roomId">Raum:</label>
-        <input type="text" name="roomId" id="roomId" placeholder="z.B. Wohnzimmer" />
-        </div>
+            <label for="roomId">Raum:</label>
+            <select name="roomId" id="roomId">
+                <% rooms.forEach(room => { %>
+                    <option value="<%= room.roomid %>"><%= room.roomid %></option>
+                <% }) %>
+            </select>
         <button type="submit">Registrieren</button>
     </form>
-    </section>
+</section>
 
+<section>
+    <h2>Neuen Raum hinzufügen</h2>
+    <form action="/registerRoom" method="POST">
+        <div>
+            <label for="roomId">Raum:</label>
+            <input type="text" name="roomId" id="roomId" placeholder="z.B. Wohnzimmer" />
+        </div>
+        <button type="submit">hinzufügen</button>
+    </form>
+</section>
 </body>
 </html>

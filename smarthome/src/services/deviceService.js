@@ -42,6 +42,30 @@ function getDevicesByRoomId(roomId) {
     .then((result) => result.rows);
 }
 
+async function addRoom(roomId) {
+  try {
+      // Überprüfe, ob der Raum bereits existiert
+      const checkSql = 'SELECT * FROM rooms WHERE roomId = $1';
+      const checkResult = await db.query(checkSql, [roomId]);
+
+      if (checkResult.rows.length === 0) {
+          // Raum existiert noch nicht, also einfügen
+          const insertRoomSql = `
+              INSERT INTO rooms (roomId, room_temperature, reduced_temperature, current_temperature)
+              VALUES ($1, $2, $3, $4)
+          `;
+          const defaults = [roomId, 22, 18, 20];
+
+          await db.query(insertRoomSql, defaults);
+          console.log(`Room '${roomId}' created with default values.`);
+      } else {
+          console.log(`Room '${roomId}' already exists.`);
+      }
+  } catch (error) {
+      console.error(`Fehler beim Hinzufügen des Raums '${roomId}':`, error);
+      throw error; // Fehler weitergeben
+  }
+}
 
 /**
  * Fügt ein neues Gerät hinzu und gibt die generierte ID zurück
@@ -190,6 +214,7 @@ module.exports = {
   getThermostate,
   getFensterkontakte,
   getDevicesByRoomId,
+  addRoom,
   addDevice,
   getDeviceByDeviceId,
   getFensterByDeviceId,
