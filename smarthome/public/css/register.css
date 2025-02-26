@@ -57,7 +57,9 @@ input, select {
 input:focus, select:focus {
     border-color: #15a03f;
 }
-
+#register{
+    margin-top: 15px;
+}
 /* Buttons */
 button {
     background: #0c8a29;

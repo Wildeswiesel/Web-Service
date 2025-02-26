@@ -1,9 +1,0 @@
-/* Hintergrund und Grundstil */
-html, body {
-  height: 100%;
-  margin: 0;
-  font-family: sans-serif;
-  background: linear-gradient(#050e05, #0f380f);
-  color: white;
-}
-
