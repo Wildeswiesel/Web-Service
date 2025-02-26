@@ -93,12 +93,6 @@ app.get('/contacts', (req, res) => {
     res.send(windowContacts);
 });
 
-
-// UI für Fenstersteuerung
-//app.get('/', (req, res) => {
-//    res.sendFile(path.join(__dirname, 'src', 'index.ejs'));
-//}); 
-
 app.listen(port, () => {
     console.log(`Fensterkontakt (Raum: ${roomId}) läuft auf Port ${port}`);
 });

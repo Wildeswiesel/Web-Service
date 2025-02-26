@@ -82,6 +82,7 @@
   </section>
 
   <script>
+    //Löschen eines Gerätes
     async function deleteDevice(deviceId) {
       if (!confirm("Willst du dieses Gerät wirklich löschen?")) return;
       try {
@@ -121,6 +122,7 @@
     updateThermostatStatuses();
     setInterval(updateThermostatStatuses, 3000);
 
+    //Abrufen der Werte für die Räume
     async function fetchRoomStatus(roomId) {
       try {
         const res = await fetch(`/room/${roomId}/status`);
@@ -134,7 +136,8 @@
       }
       return null;
     }
-
+    
+    // Funktion welche die Temperaturen in den Räumen aktualisiert und auf 2 Nachkommastellen kürzt
     async function updateRoomTemperatures() {
       const rows = document.querySelectorAll('tr[data-room-id]');
       for (const row of rows) {

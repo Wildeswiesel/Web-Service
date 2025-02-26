@@ -1,4 +1,4 @@
-
+//Schließen eines Fensters
 async function setClosed(deviceId) {
     try {
       const res = await fetch(`/fensterkontakte/${deviceId}/closed`, { method: 'POST' });
@@ -8,7 +8,7 @@ async function setClosed(deviceId) {
       alert('Fehler beim Schließen des Fensters');
     }
   }
-
+  //Öffnen eines Fensters
   async function setOpen(deviceId) {
     try {
       const res = await fetch(`/fensterkontakte/${deviceId}/open`, { method: 'POST' });
@@ -19,6 +19,7 @@ async function setClosed(deviceId) {
     }
   }
 
+  //Status eines Fensters abrufen
   async function getStatus(deviceId) {
     try {
       const res = await fetch(`/fensterkontakte/${deviceId}/status`);
