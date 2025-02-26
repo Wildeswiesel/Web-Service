@@ -1,4 +1,5 @@
 const express = require('express');
+const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
 const axios = require('axios');
@@ -24,6 +25,22 @@ app.set('view engine', 'ejs');
 // Routen
 app.use('/thermostats', thermostatRoutes);
 app.use('/fensterkontakte', fensterkontaktRoutes);
+
+app.use(session({
+  secret: 'geheimerschlüssel',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { maxAge: 5000 } // Optional: Ablaufzeit der Session
+}));
+
+app.use((req, res, next) => {
+  res.locals.message = req.session.message || null;
+  res.locals.messageType = req.session.messageType || null;
+  delete req.session.message;
+  delete req.session.messageType;
+  next();
+});
+
 
 app.use(async (req, res, next) => {
   try {
@@ -134,7 +151,9 @@ app.post('/room/:roomId/updateReducedTemperature', async (req, res) => {
 app.post('/register', async (req, res) => {
   const { type, roomId } = req.body;
   if (!type) {
-    return res.status(400).send('type ist ein Pflichtfeld');
+    req.session.message = "Gerätetyp ist erforderlich!";
+    req.session.messageType = "error";
+    return res.redirect('/register');
   }
   try {
     const deviceId = await deviceService.addDevice(type, roomId);
@@ -143,11 +162,14 @@ app.post('/register', async (req, res) => {
     } else if (type === 'fensterkontakt') {
       await fensterkontaktService.createFensterkontaktContainer(deviceId, 'closed', roomId);
     }
-    res.redirect('/');
+    req.session.message = "Gerät erfolgreich registriert!";
+    req.session.messageType = "success";
   } catch (err) {
     console.error('Fehler beim Hinzufügen eines Geräts:', err);
-    res.status(500).send('Gerät konnte nicht angelegt werden');
+    req.session.message = "Gerät konnte nicht angelegt werden.";
+    req.session.messageType = "error";
   }
+  res.redirect('/register');
 });
 
 
@@ -156,16 +178,20 @@ app.post('/registerRoom', async (req, res) => {
         const { roomId } = req.body;
 
         if (!roomId || roomId.trim() === '') {
-            return res.status(400).json({ error: 'Raum-ID darf nicht leer sein' });
-        }
+          req.session.message = "Raum-ID darf nicht leer sein!";
+          req.session.messageType = "error";
+          return res.redirect('/register');        }
 
         await deviceService.addRoom(roomId.trim());
 
-        res.redirect('/');
+        req.session.message = "Raum erfolgreich hinzugefügt!";
+        req.session.messageType = "success";
       } catch (error) {
         console.error('Fehler beim Hinzufügen des Raums:', error);
-        res.status(500).json({ error: 'Interner Serverfehler' });
-    }
+        req.session.message = "Interner Serverfehler.";
+        req.session.messageType = "error";    
+      }
+      res.redirect('/register');
 });
 
 
