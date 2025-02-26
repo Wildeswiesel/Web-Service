@@ -3,7 +3,6 @@ const { Pool } = require('pg');
 const app = express();
 app.use(express.json());
 
-// Datenbankverbindung
 const pool = new Pool({
   user: process.env.PGUSER || 'postgres',
   host: process.env.PGHOST || 'db',
@@ -18,7 +17,7 @@ const roomId = process.env.ROOM_ID || 'none';
 let currentTemperature = 22;
 let roomTemperature = 22;
 let reducedTemperature = 18;
-let windowStatus = 'closed';  // Für den Moment immer 'closed'
+let windowStatus = 'closed'; 
 let heatingMode = 0;
 
 let sseClients = [];
@@ -38,14 +37,12 @@ app.get('/events', (req, res) => {
   });
 });
 
-// Funktion zum Senden eines Events an alle verbundenen Clients
 function sendSSEEvent(data) {
   sseClients.forEach(client => {
     client.write(`data: ${JSON.stringify(data)}\n\n`);
   });
 }
 
-// Liest die Raumwerte aus der Tabelle rooms für den gegebenen roomId
 async function fetchRoomValues() {
   try {
     const { rows: [row] } = await pool.query(
@@ -60,7 +57,6 @@ async function fetchRoomValues() {
   }
 }
 
-// Aktualisiert den aktuellen Temperaturwert in der Tabelle rooms
 async function updateRoomCurrentTemperature() {
   try {
     await pool.query(
@@ -76,7 +72,7 @@ function updateHeatingMode() {
   let target = (windowStatus === 'open') ? reducedTemperature : roomTemperature;
   let coolingRate = (windowStatus === 'open') ? 0.13 : 0.015;
   currentTemperature -= coolingRate;
-  // Fehler und wie schnell sich der Fehler ändert berechnen:
+
   let error = target - currentTemperature;
   let errorRate = error - previousError;
   previousError = error;
@@ -97,8 +93,7 @@ function updateHeatingMode() {
   } else {
     heatingMode = 5;
   }
- 
-  // Basis-Heiz-Inkremente je heatingMode:
+
   let baseIncrement = 0;
   switch (heatingMode) {
     case 1: baseIncrement = 0.01; break;
@@ -109,22 +104,20 @@ function updateHeatingMode() {
     default: baseIncrement = 0;
   }
   
-  // Dynamischer Faktor: Je höher currentTemperature ist, desto weniger bringt das Heizen
   let reductionFactor = 0.1 * currentTemperature;
   let heatingIncrement = baseIncrement / reductionFactor;
   currentTemperature += heatingIncrement;
   
-  // Sende das Update per SSE an alle verbundenen Clients:
   sendSSEEvent({ thermostatId, roomId, currentTemperature, roomTemperature, reducedTemperature, heatingMode, windowStatus });
 }
 
-// Diese Funktion wird alle 1000ms asynchron aufgerufen:
 setInterval(async () => {
   await fetchRoomValues();
   updateHeatingMode();
   await updateRoomCurrentTemperature();
 }, 1000);
 
+// kann weg --------------------
 // Endpunkt, um den Status abzurufen
 app.get('/status', (req, res) => {
   res.json({
@@ -137,11 +130,10 @@ app.get('/status', (req, res) => {
     windowStatus
   });
 });
+// bis hier ----------------------------
 
-// Mit /update können manuell Werte gesetzt werden:
 app.post('/update', async (req, res) => {
   const { currentTemp, roomTemp, reducedTemp, window } = req.body;
-  console.log("Empfangene Daten:", req.body); // Debugging-Log
 
   if (currentTemp !== undefined) {
     currentTemperature = Number(currentTemp);

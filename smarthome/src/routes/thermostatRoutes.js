@@ -14,6 +14,7 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Kann aktuell noch weg -----------------
 // GET /thermostats/:deviceId/status – Query the running thermostat container
 router.get('/:deviceId/status', async (req, res) => {
   const { deviceId } = req.params;
@@ -35,5 +36,6 @@ router.get('/:deviceId/status', async (req, res) => {
     res.status(500).json({ error: 'Thermostat unreachable' });
   }
 });
+//bis hier ------------------------------
 
 module.exports = router;

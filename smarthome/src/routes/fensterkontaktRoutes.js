@@ -18,6 +18,7 @@ router.get('/', async (req, res) => {
     }
 });
 
+// kann aktuell noch weg (glaub ich zumindest) ----------------------
 router.get('/:deviceId/status', async (req, res) => {
     const { deviceId } = req.params;
     const device = await deviceService.getFensterByDeviceId(deviceId);
@@ -39,6 +40,7 @@ router.get('/:deviceId/status', async (req, res) => {
       res.status(500).json({ error: 'Fensterkontakt nicht erreichbar' });
     }
 })
+// bis hier -------------------------------  
 
 
  //POST /fensterkontakt/:deviceId/closed
