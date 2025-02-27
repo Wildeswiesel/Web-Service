@@ -63,7 +63,7 @@ async function addRoom(roomId) {
       }
   } catch (error) {
       console.error(`Fehler beim Hinzufügen des Raums '${roomId}':`, error);
-      throw error; // Fehler weitergeben
+      throw error; 
   }
 }
 
@@ -73,7 +73,7 @@ async function addRoom(roomId) {
 // src/services/deviceService.js
 
 async function addDevice(type, roomId) {
-  // 1. Hole die höchste vorhandene deviceId
+  //  Holt die höchste, vorhandene deviceId
   if (type === "thermostat") {
     const thermoResult = await db.query("SELECT MAX(deviceId) FROM devices WHERE type='thermostat'");
     const thermoMaxDeviceId = thermoResult.rows[0]?.max || 0;  // Falls keine Einträge existieren, setze auf 0
@@ -89,7 +89,7 @@ async function addDevice(type, roomId) {
   } else {
     throw new Error(`Unbekannter Gerätetyp: ${type}`);
   }
-  // 2. Gerät in die DB einfügen
+  //  Gerät in die DB einfügen
   const sql = `
     INSERT INTO devices (deviceId, type, roomId)
     VALUES ($1, $2, $3)
@@ -151,7 +151,7 @@ function getThermostateByRoom(roomId) {
  */
 async function deleteDevice(id) {
   try {
-    // 1️⃣ Gerät aus der DB holen, um die `deviceid` und den Typ zu bekommen
+    // Gerät aus der DB holen, um die `deviceid` und den Typ zu bekommen
     const result = await db.query('SELECT * FROM devices WHERE id = $1', [id]);
     if (result.rows.length === 0) {
       return 0; // Gerät nicht gefunden
@@ -160,7 +160,7 @@ async function deleteDevice(id) {
     const device = result.rows[0];
     let containerName;
 
-    // 🔍 2️⃣ Container-Name je nach Gerätetyp setzen
+    //Container-Name je nach Gerätetyp setzen
     if (device.type === 'thermostat') {
       containerName = `web-service-thermostat-${device.deviceid}`;
     } else if (device.type === 'fensterkontakt') {
@@ -170,7 +170,7 @@ async function deleteDevice(id) {
       containerName = null;
     }
 
-    // 🚀 3️⃣ Docker-Container stoppen und löschen (falls vorhanden)
+    // Docker-Container stoppen und löschen 
     if (containerName) {
       try {
         const container = await docker.getContainer(containerName);
@@ -182,7 +182,7 @@ async function deleteDevice(id) {
       }
     }
 
-    // 🗑️ 4️⃣ Gerät aus der DB löschen
+    // Gerät aus der DB löschen
     const deleteResult = await db.query('DELETE FROM devices WHERE id = $1', [id]);
     return deleteResult.rowCount;
   } catch (error) {
