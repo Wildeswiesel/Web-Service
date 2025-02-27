@@ -30,9 +30,9 @@ async function addDevice(deviceId, type, roomId) {
   try {
     // Prüfen, ob bereits ein Gerät mit diesem Typ und Raum existiert
     const checkQuery = `
-      SELECT * FROM devices WHERE type = $1 AND roomId = $2;
+      SELECT * FROM devices WHERE type = $1 AND roomId = $2 AND deviceId=$3;
     `;
-    const checkResult = await pool.query(checkQuery, [type, roomId]);
+    const checkResult = await pool.query(checkQuery, [type, roomId, deviceId]);
     if (checkResult.rows.length > 0) {
       console.log(`⚠️ Gerät (${type}, ${roomId}) existiert bereits.`);
       // Gebe deviceId des bereits existierenden Geräts zurück

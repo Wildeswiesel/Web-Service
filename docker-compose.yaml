@@ -54,6 +54,51 @@ services:
       ROOM_ID: "Wohnzimmer"
       THERMOSTAT_ID: 1
   
+  thermostat2:
+    container_name: web-service-thermostat-2
+    build:
+      context: .
+      dockerfile: thermostat/Dockerfile
+    image: thermostat-image
+    networks: 
+      - smarthome-nw
+    ports:
+      - "6002:6002"
+    environment:
+      PORT: 6002
+      ROOM_ID: "Wohnzimmer"
+      THERMOSTAT_ID: 2
+
+  thermostat3:
+    container_name: web-service-thermostat-3
+    build:
+      context: .
+      dockerfile: thermostat/Dockerfile
+    image: thermostat-image
+    networks: 
+      - smarthome-nw
+    ports:
+      - "6003:6003"
+    environment:
+      PORT: 6003
+      ROOM_ID: "Küche"
+      THERMOSTAT_ID: 3
+
+  thermostat4:
+    container_name: web-service-thermostat-4
+    build:
+      context: .
+      dockerfile: thermostat/Dockerfile
+    image: thermostat-image
+    networks: 
+      - smarthome-nw
+    ports:
+      - "6004:6004"
+    environment:
+      PORT: 6004
+      ROOM_ID: "Bad"
+      THERMOSTAT_ID: 4
+
   fensterkontakt:
     container_name: web-service-fensterkontakt-1
     build:

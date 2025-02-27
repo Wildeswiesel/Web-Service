@@ -65,7 +65,7 @@ router.post('/:deviceId/closed', async (req, res) => {
       targetMode: CLOSED_MODE,
       mode: 'close'
     };
-    const updateRes = await axios.post(`http://${containerName}:${port}/toggle`, body);
+    const updateRes = await axios.post(`http://${containerName}:${port}/close`, body);
     res.json(updateRes.data);
   } catch (err) {
     console.error('Fehler beim Schließen des Fensters:', err.message);
@@ -94,7 +94,7 @@ router.post('/:deviceId/open', async (req, res) => {
       targetMode: OPEN_MODE,
       mode: 'open'
     };
-    const updateRes = await axios.post(`http://${containerName}:${port}/toggle`, body);
+    const updateRes = await axios.post(`http://${containerName}:${port}/open`, body);
     res.json(updateRes.data);
   } catch (err) {
     console.error('Fehler beim Öffnen des Fensters:', err.message);

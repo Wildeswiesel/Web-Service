@@ -17,6 +17,8 @@ let mode = 'closed'; // Fensterzustand: 'closed', 'open'
 const SMART_HOME_URL = "http://web-service-smarthome-1:3000/fensterstatus"; // URL vom Smart Home
 
 app.use(express.json());
+const OPEN_MODE = 'open';
+const CLOSED_MODE = 'closed';
 
 app.get('/status', (req, res) =>  {
     res.json({
@@ -65,29 +67,39 @@ app.post('/control', (req, res) => {
     res.send({ message: `Fenster ${action}`, id });
 });
 
-
-
-// Umschalten des Fensterzustands
-app.post('/toggle', async (req, res) => {
-    // Fensterstatus umschalten
-    mode = mode === 'closed' ? 'open' : 'closed';
-    console.log(`Fensterstatus geändert: ${mode}`);
-
+//öffnet das Fenster
+app.post('/open', async (req, res) => {
+    console.log('Öffne das Fenster...');
     try {
         // Nachricht an das Smart Home senden
         await axios.post(SMART_HOME_URL, {
             deviceId: process.env.FENSTERKONTAKT_ID,
             roomId: process.env.ROOM_ID,
-            status: mode // 'open' oder 'closed'
+            status: OPEN_MODE  // 'open'
         });
-
-        res.json({ message: `Fenster ist jetzt ${mode}`, success: true });
+        res.json({ message: `Fenster ist jetzt ${OPEN_MODE}`, success: true });
     } catch (err) {
-        console.error('Fehler beim Senden an das Smart Home:', err.message);
+        console.error('Fehler beim Öffnen des Fensters:', err.message);
         res.status(500).json({ error: 'Smart Home nicht erreichbar' });
     }
 });
 
+//schließt das Fenster
+app.post('/close', async (req, res) => {
+    console.log('Schließe das Fenster...');
+    try {
+        // Nachricht an das Smart Home senden
+        await axios.post(SMART_HOME_URL, {
+            deviceId: process.env.FENSTERKONTAKT_ID,
+            roomId: process.env.ROOM_ID,
+            status: CLOSED_MODE  // 'closed'
+        });
+        res.json({ message: `Fenster ist jetzt ${CLOSED_MODE}`, success: true });
+    } catch (err) {
+        console.error('Fehler beim Schließen des Fensters:', err.message);
+        res.status(500).json({ error: 'Smart Home nicht erreichbar' });
+    }
+});
 // Liste aller registrierten Fensterkontakte
 app.get('/contacts', (req, res) => {
     res.send(windowContacts);

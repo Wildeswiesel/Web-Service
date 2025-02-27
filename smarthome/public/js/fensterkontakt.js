@@ -3,7 +3,7 @@ async function setClosed(deviceId) {
     try {
       const res = await fetch(`/fensterkontakte/${deviceId}/closed`, { method: 'POST' });
       const data = await res.json();
-      alert(`Fenster ist geschlossen:\n${JSON.stringify(data)}`);
+      alert(`Fenster ist geschlossen`);
     } catch (err) {
       alert('Fehler beim Schließen des Fensters');
     }
@@ -13,7 +13,7 @@ async function setClosed(deviceId) {
     try {
       const res = await fetch(`/fensterkontakte/${deviceId}/open`, { method: 'POST' });
       const data = await res.json();
-      alert(`Fenster ist geöffnet:\n${JSON.stringify(data)}`);
+      alert(`Fenster ist geöffnet:`);
     } catch (err) {
       alert('Fehler beim Öffnen des Fensters');
     }

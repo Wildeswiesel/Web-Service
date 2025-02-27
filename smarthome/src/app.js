@@ -197,12 +197,10 @@ app.post('/registerRoom', async (req, res) => {
 
 app.post('/fensterstatus', async (req, res) => {
   const { deviceId, roomId, status } = req.body;
-  console.log(`Fensterstatus erhalten: Fenster ${deviceId} ist jetzt ${status}`);
 
   try {
       // Finde alle Thermostate im gleichen Raum
       const thermostate = await deviceService.getThermostateByRoom(roomId);
-      console.log("Gefundene Thermostate:", thermostate);      
 
       if (thermostate.length === 0) {
           return res.status(404).json({ error: 'Kein Thermostat für diesen Raum gefunden' });
