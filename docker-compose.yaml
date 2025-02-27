@@ -51,7 +51,6 @@ services:
       - "6001:6001"
     environment:
       PORT: 6001
-      DEFAULT_TEMPERATURE: 22
       ROOM_ID: "Wohnzimmer"
       THERMOSTAT_ID: 1
   

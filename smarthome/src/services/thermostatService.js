@@ -1,7 +1,7 @@
 const Docker = require('dockerode');          
 const docker = new Docker({ socketPath: '/var/run/docker.sock' });
 
-async function createThermostatContainer(thermostatId, defaultTemperature = 22, roomId = '') {
+async function createThermostatContainer(thermostatId, roomId = '') {
   const hostPort = 6000 + thermostatId;
   try {
     const container = await docker.createContainer({
@@ -9,10 +9,7 @@ async function createThermostatContainer(thermostatId, defaultTemperature = 22, 
       name: `web-service-thermostat-${thermostatId}`,
       Env: [
         `THERMOSTAT_ID=${thermostatId}`,
-        `DEFAULT_TEMPERATURE=${defaultTemperature}`,
         `ROOM_ID=${roomId}`,   
-        `ROOM_TEMPERATURE=22`,
-        `REDUCED_TEMPERATURE=18`,
         `PORT=${hostPort}`
       ],
       ExposedPorts: {
@@ -34,4 +31,3 @@ async function createThermostatContainer(thermostatId, defaultTemperature = 22, 
 }
 
 module.exports = { createThermostatContainer };
-

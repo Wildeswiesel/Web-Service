@@ -158,7 +158,7 @@ app.post('/register', async (req, res) => {
   try {
     const deviceId = await deviceService.addDevice(type, roomId);
     if (type === 'thermostat') {
-      await thermostatService.createThermostatContainer(deviceId, 22, roomId);
+      await thermostatService.createThermostatContainer(deviceId, roomId);
     } else if (type === 'fensterkontakt') {
       await fensterkontaktService.createFensterkontaktContainer(deviceId, 'closed', roomId);
     }
