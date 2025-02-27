@@ -3,9 +3,8 @@ const db = require('../db');
 const Docker = require('dockerode');
 const docker = new Docker({ socketPath: '/var/run/docker.sock' });
 
-/**
- * Liefert alle Geräte als Array zurück
- */
+
+//Liefert alle Geräte als Array zurück
 function getAllDevices() {
   return db
     .query('SELECT * FROM devices')
@@ -67,11 +66,8 @@ async function addRoom(roomId) {
   }
 }
 
-/**
- * Fügt ein neues Gerät hinzu und gibt die generierte ID zurück
- */
+//Fügt ein neues Gerät hinzu und gibt die generierte ID zurück
 // src/services/deviceService.js
-
 async function addDevice(type, roomId) {
   //  Holt die höchste, vorhandene deviceId
   if (type === "thermostat") {
@@ -118,10 +114,7 @@ async function addDevice(type, roomId) {
   return deviceId; // Rückgabe der automatisch generierten deviceId
 }
 
-
-/**
- * Suche Gerät nach deviceId
- */
+//Suche Gerät nach deviceId
 function getDeviceByDeviceId(deviceId) {
   const sql = 'SELECT * FROM devices WHERE deviceId = $1';
   return db.query(sql, [deviceId])
@@ -146,9 +139,7 @@ function getThermostateByRoom(roomId) {
     .then((result) => result.rows);
 }
 
-/**
- * Löschen eines Geräts anhand seiner internen ID
- */
+//Löschen eines Geräts anhand seiner internen ID
 async function deleteDevice(id) {
   try {
     // Gerät aus der DB holen, um die `deviceid` und den Typ zu bekommen

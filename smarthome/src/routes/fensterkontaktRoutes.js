@@ -18,7 +18,6 @@ router.get('/', async (req, res) => {
     }
 });
 
- //POST /fensterkontakt/:deviceId/closed
  //Schließt das Fenster.
 router.post('/:deviceId/closed', async (req, res) => {
   const { deviceId } = req.params;
@@ -32,9 +31,9 @@ router.post('/:deviceId/closed', async (req, res) => {
   }
 
   const containerName = `web-service-fensterkontakt-${deviceId}`;
-  const port = startPort+Number(deviceId); //ggf noch Port umändern
+  const port = startPort+Number(deviceId);
 
-  // "Geschlossener Modus" an Fensterkontakt schicken
+  // Geschlossener Modus an Fensterkontakt schicken
   try {
     const body = {
       targetMode: CLOSED_MODE,
@@ -48,8 +47,6 @@ router.post('/:deviceId/closed', async (req, res) => {
   }
 });
 
-
- //POST /fensterkontakt/:deviceId/open
  //Öffnet das Fenster.
 router.post('/:deviceId/open', async (req, res) => {
   const { deviceId } = req.params;
@@ -63,7 +60,8 @@ router.post('/:deviceId/open', async (req, res) => {
   }
 
   const containerName = `web-service-fensterkontakt-${deviceId}`;
-  const port = startPort+Number(deviceId); //ggf noch Port umändern falls nicht passt
+  const port = startPort+Number(deviceId);
+  // Geöffneter Modus an Fensterkontakt schicken
   try {
     const body = {
       targetMode: OPEN_MODE,
