@@ -1,8 +1,5 @@
-const Docker = require('dockerode');          //für die Thermostate
+const Docker = require('dockerode');          
 const docker = new Docker({ socketPath: '/var/run/docker.sock' });
-
- // Erstellt einen neuen Thermostat-Container mit der übergebenen numerischen ID, einer Starttemperatur (Standard: 22°C) und optionaler Raumzuordnung.
-// src/services/thermostatService.js
 
 async function createThermostatContainer(thermostatId, defaultTemperature = 22, roomId = '') {
   const hostPort = 6000 + thermostatId;
@@ -13,7 +10,7 @@ async function createThermostatContainer(thermostatId, defaultTemperature = 22, 
       Env: [
         `THERMOSTAT_ID=${thermostatId}`,
         `DEFAULT_TEMPERATURE=${defaultTemperature}`,
-        `ROOM_ID=${roomId}`,   // Hier wird roomId aus dem Registrierungsprozess verwendet.
+        `ROOM_ID=${roomId}`,   
         `ROOM_TEMPERATURE=22`,
         `REDUCED_TEMPERATURE=18`,
         `PORT=${hostPort}`

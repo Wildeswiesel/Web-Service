@@ -117,20 +117,9 @@ setInterval(async () => {
   await updateRoomCurrentTemperature();
 }, 1000);
 
-// kann weg --------------------
-// Endpunkt, um den Status abzurufen
 app.get('/status', (req, res) => {
-  res.json({
-    thermostatId,
-    roomId,
-    currentTemperature,
-    roomTemperature,
-    reducedTemperature,
-    heatingMode,
-    windowStatus
-  });
+  res.json({ heatingMode });
 });
-// bis hier ----------------------------
 
 app.post('/update', async (req, res) => {
   const { currentTemp, roomTemp, reducedTemp, window } = req.body;
