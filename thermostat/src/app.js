@@ -13,13 +13,12 @@ const pool = new Pool({
 
 const thermostatId = process.env.THERMOSTAT_ID || '1';
 const roomId = process.env.ROOM_ID || 'none';
+let currentTemperature = Number(process.env.DEFAULT_TEMPERATURE) || 22;
+let roomTemperature = Number(process.env.DEFAULT_TEMPERATURE) || 22;
 
-let currentTemperature = 22;
-let roomTemperature = 22;
 let reducedTemperature = 18;
 let windowStatus = 'closed'; 
 let heatingMode = 0;
-
 let sseClients = [];
 let previousError = 0;
 
