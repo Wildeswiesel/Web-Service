@@ -18,31 +18,6 @@ router.get('/', async (req, res) => {
     }
 });
 
-// kann aktuell noch weg (glaub ich zumindest) ----------------------
-router.get('/:deviceId/status', async (req, res) => {
-    const { deviceId } = req.params;
-    const device = await deviceService.getFensterByDeviceId(deviceId);
-    if (!device) {
-        return res.status(404).json({ error: 'Fensterkontakt nicht gefunden.'});
-    }
-    if (device.type !== 'fensterkontakt') {
-        return res.status(400).json({ error: 'Gerät ist kein Fensterkontakt.'})
-    }
-
-    const containerName = `web-service-fensterkontakt-${deviceId}`;
-    const port = startPort+Number(deviceId); //muss man noch schauen wie das geändert werden soll
-
-    try {
-      const response = await axios.get(`http://${containerName}:${port}/status`);
-      res.json(response.data); 
-    } catch (err) {
-      console.error('Fehler beim Abfragen des Fensterkontakt-Status:', err.message);
-      res.status(500).json({ error: 'Fensterkontakt nicht erreichbar' });
-    }
-})
-// bis hier -------------------------------  
-
-
  //POST /fensterkontakt/:deviceId/closed
  //Schließt das Fenster.
 router.post('/:deviceId/closed', async (req, res) => {
