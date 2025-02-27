@@ -19,28 +19,7 @@ let roomTemperature = 22;
 let reducedTemperature = 18;
 let windowStatus = 'closed'; 
 let heatingMode = 0;
-let sseClients = [];
 let previousError = 0;
-
-// SSE-Endpoint: Clients verbinden sich hier, um kontinuierlich Updates zu erhalten
-app.get('/events', (req, res) => {
-  res.set({
-    'Content-Type': 'text/event-stream',
-    'Cache-Control': 'no-cache',
-    'Connection': 'keep-alive'
-  });
-  res.flushHeaders();
-  sseClients.push(res);
-  req.on('close', () => {
-    sseClients = sseClients.filter(client => client !== res);
-  });
-});
-
-function sendSSEEvent(data) {
-  sseClients.forEach(client => {
-    client.write(`data: ${JSON.stringify(data)}\n\n`);
-  });
-}
 
 async function fetchRoomValues() {
   try {
@@ -53,17 +32,6 @@ async function fetchRoomValues() {
     currentTemperature = Number(row.current_temperature);
   } catch (err) {
     console.error('Error fetching room values:', err);
-  }
-}
-
-async function updateRoomCurrentTemperature() {
-  try {
-    await pool.query(
-      'UPDATE rooms SET current_temperature = $1 WHERE roomId = $2',
-      [currentTemperature, roomId]
-    );
-  } catch (err) {
-    console.error('Error updating current temperature in DB:', err);
   }
 }
 
@@ -106,8 +74,17 @@ function updateHeatingMode() {
   let reductionFactor = 0.1 * currentTemperature;
   let heatingIncrement = baseIncrement / reductionFactor;
   currentTemperature += heatingIncrement;
-  
-  sendSSEEvent({ thermostatId, roomId, currentTemperature, roomTemperature, reducedTemperature, heatingMode, windowStatus });
+}
+
+async function updateRoomCurrentTemperature() {
+  try {
+    await pool.query(
+      'UPDATE rooms SET current_temperature = $1 WHERE roomId = $2',
+      [currentTemperature, roomId]
+    );
+  } catch (err) {
+    console.error('Error updating current temperature in DB:', err);
+  }
 }
 
 setInterval(async () => {
