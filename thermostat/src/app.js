@@ -14,7 +14,7 @@ const pool = new Pool({
 const thermostatId = process.env.THERMOSTAT_ID || '1';
 const roomId = process.env.ROOM_ID || 'none';
 
-let currentTemperature = 22;
+let currentTemperature = 20;
 let roomTemperature = 22;
 let reducedTemperature = 18;
 let windowStatus = 'closed'; 
